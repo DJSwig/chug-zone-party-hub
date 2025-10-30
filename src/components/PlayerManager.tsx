@@ -36,10 +36,6 @@ export const PlayerManager = ({
   };
 
   const handleRemovePlayer = (playerId: string) => {
-    if (players.length <= 2) {
-      toast.error("Need at least 2 players!");
-      return;
-    }
     const player = players.find((p) => p.id === playerId);
     onPlayersChange(players.filter((p) => p.id !== playerId));
     toast.success(`${player?.name} left the game`);
@@ -53,7 +49,17 @@ export const PlayerManager = ({
 
   return (
     <Card className="p-6 bg-gradient-card border-border">
-      <h2 className="text-2xl font-bold mb-4 text-foreground">Players</h2>
+      <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between">
+        Players
+        <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
+      </h2>
+
+      {players.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          <p className="text-sm mb-2">No players yet</p>
+          <p className="text-xs">Add players below to start!</p>
+        </div>
+      )}
 
       <div className="space-y-3 mb-4">
         {players.map((player, index) => (

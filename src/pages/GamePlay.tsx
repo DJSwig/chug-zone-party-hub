@@ -14,10 +14,7 @@ const CARD_DECK = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", 
 export default function GamePlay() {
   const { gameId } = useParams();
   const navigate = useNavigate();
-  const [players, setPlayers] = useState<Player[]>([
-    { id: "1", name: "Player 1" },
-    { id: "2", name: "Player 2" },
-  ]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [rules, setRules] = useState<KingsCupRule[]>([]);
   const [currentCard, setCurrentCard] = useState<string | null>(null);
@@ -34,6 +31,11 @@ export default function GamePlay() {
   }, [gameId]);
 
   const handleDrawCard = () => {
+    if (players.length === 0) {
+      toast.error("Add players first!");
+      return;
+    }
+
     if (drawnCards.size >= 52) {
       toast.error("All cards drawn! Restart the game.");
       return;
@@ -80,9 +82,9 @@ export default function GamePlay() {
 
   return (
     <PageTransition>
-      <div className="h-screen bg-background flex overflow-hidden">
+      <div className="min-h-screen bg-background flex overflow-y-auto">
       {/* Left Sidebar - Player List */}
-      <div className="w-80 border-r border-border flex flex-col overflow-hidden">
+      <div className="w-80 border-r border-border flex flex-col max-h-screen sticky top-0">
         <div className="p-4 border-b border-border">
           <Button
             variant="ghost"
@@ -95,7 +97,7 @@ export default function GamePlay() {
           </Button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <PlayerManager
             players={players}
             currentPlayerIndex={currentPlayerIndex}
@@ -105,14 +107,14 @@ export default function GamePlay() {
       </div>
 
       {/* Main Game Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {/* Top Bar - Current Player */}
-        <div className="flex items-center justify-center py-4 border-b border-border bg-card/50">
+        <div className="flex items-center justify-center py-4 border-b border-border bg-card/50 sticky top-0 z-10">
           <Card className="px-8 py-3 bg-gradient-card border-primary shadow-glow-cyan">
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Current Turn:</span>
               <span className="text-3xl font-bold text-primary animate-glow-pulse">
-                {players[currentPlayerIndex]?.name}
+                {players[currentPlayerIndex]?.name || "Add players to start"}
               </span>
             </div>
           </Card>
@@ -188,9 +190,9 @@ export default function GamePlay() {
           </div>
         </div>
 
-        {/* Bottom Controls */}
-        <div className="border-t border-border bg-card/50 p-4">
-          <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+        {/* Bottom Controls - Fixed */}
+        <div className="sticky bottom-0 border-t border-border bg-card/95 backdrop-blur-sm p-4 z-10">
+          <div className="max-w-4xl mx-auto flex items-center justify-center gap-4 flex-wrap">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <span className="font-bold text-foreground">{52 - drawnCards.size}</span>
               <span>cards remaining</span>
@@ -208,8 +210,8 @@ export default function GamePlay() {
 
               <Button
                 onClick={handleDrawCard}
-                disabled={drawnCards.size >= 52}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl px-8 py-6 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={drawnCards.size >= 52 || players.length === 0}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl px-8 py-6 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed animate-button-pulse"
               >
                 <Shuffle className="w-5 h-5 mr-2" />
                 Draw Card
@@ -224,8 +226,6 @@ export default function GamePlay() {
                 Restart
               </Button>
             </div>
-
-            <div className="w-32" /> {/* Spacer for balance */}
           </div>
         </div>
       </div>
