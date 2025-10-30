@@ -61,29 +61,31 @@ export const PlayerManager = ({
         </div>
       )}
 
-      <div className="space-y-3 mb-4">
+      <div className={`grid gap-3 mb-4 ${
+        players.length > 6 ? 'grid-cols-2' : 'grid-cols-1'
+      }`}>
         {players.map((player, index) => (
           <div
             key={player.id}
-            className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+            className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
               index === currentPlayerIndex
                 ? "border-primary bg-primary/10 shadow-glow-cyan"
                 : "border-border bg-muted/30"
             }`}
           >
-            <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
             <Input
               value={player.name}
               onChange={(e) => handleNameChange(player.id, e.target.value)}
-              className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium"
+              className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1"
             />
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleRemovePlayer(player.id)}
-              className="flex-shrink-0 text-muted-foreground hover:text-destructive"
+              className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3" />
             </Button>
           </div>
         ))}

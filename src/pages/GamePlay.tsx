@@ -6,8 +6,16 @@ import { ArrowLeft, RotateCcw, Edit, Shuffle } from "lucide-react";
 import { KingsCupRule, Player } from "@/types/game";
 import { PlayerManager } from "@/components/PlayerManager";
 import { RuleEditor } from "@/components/RuleEditor";
+import { HostPanel } from "@/components/HostPanel";
+import { MateSelector } from "@/components/MateSelector";
 import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
+
+interface Mate {
+  id: string;
+  player1: Player;
+  player2: Player;
+}
 
 const CARD_DECK = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
@@ -22,6 +30,9 @@ export default function GamePlay() {
   const [showRuleEditor, setShowRuleEditor] = useState(false);
   const [drawnCards, setDrawnCards] = useState<Set<number>>(new Set());
   const [flippingCard, setFlippingCard] = useState<number | null>(null);
+  const [mates, setMates] = useState<Mate[]>([]);
+  const [showMateSelector, setShowMateSelector] = useState(false);
+  const [stackDates, setStackDates] = useState(false);
 
   useEffect(() => {
     const savedRules = localStorage.getItem(`${gameId}-rules`);
@@ -55,14 +66,48 @@ export default function GamePlay() {
     
     setTimeout(() => {
       setCurrentCard(cardType);
-      setCurrentRule(rule?.rule || "No rule found!");
+      const ruleText = rule?.rule || "No rule found!";
+      setCurrentRule(ruleText);
       setDrawnCards(new Set([...drawnCards, cardIndex]));
       setFlippingCard(null);
       
       toast.success(`${players[currentPlayerIndex].name} drew a ${cardType}!`);
       
+      // Check if rule contains "date" or "mate"
+      if (ruleText.toLowerCase().includes("date") || ruleText.toLowerCase().includes("mate")) {
+        setTimeout(() => {
+          setShowMateSelector(true);
+        }, 500);
+      }
+      
       setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
     }, 300);
+  };
+
+  const handleAddMate = (player1Id: string, player2Id: string) => {
+    const player1 = players.find((p) => p.id === player1Id);
+    const player2 = players.find((p) => p.id === player2Id);
+
+    if (!player1 || !player2) return;
+
+    const newMate: Mate = {
+      id: Date.now().toString(),
+      player1,
+      player2,
+    };
+
+    if (stackDates) {
+      setMates([...mates, newMate]);
+    } else {
+      setMates([newMate]);
+    }
+
+    toast.success(`${player1.name} & ${player2.name} are now mates! 💕`);
+  };
+
+  const handleRemoveMate = (mateId: string) => {
+    setMates(mates.filter((m) => m.id !== mateId));
+    toast.success("Mate removed");
   };
 
   const handleRestart = () => {
@@ -71,6 +116,7 @@ export default function GamePlay() {
     setCurrentPlayerIndex(0);
     setDrawnCards(new Set());
     setFlippingCard(null);
+    setMates([]);
     toast.success("Game restarted!");
   };
 
@@ -230,6 +276,16 @@ export default function GamePlay() {
         </div>
       </div>
 
+      {/* Right Panel - Host Notes & Mates */}
+      <HostPanel
+        players={players}
+        mates={mates}
+        onAddMate={() => setShowMateSelector(true)}
+        onRemoveMate={handleRemoveMate}
+        stackDates={stackDates}
+        onStackDatesChange={setStackDates}
+      />
+
       {showRuleEditor && (
         <RuleEditor
           rules={rules}
@@ -240,6 +296,14 @@ export default function GamePlay() {
             toast.success("Rules updated!");
           }}
           onClose={() => setShowRuleEditor(false)}
+        />
+      )}
+
+      {showMateSelector && (
+        <MateSelector
+          players={players}
+          onConfirm={handleAddMate}
+          onClose={() => setShowMateSelector(false)}
         />
       )}
       </div>
