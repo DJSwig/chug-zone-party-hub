@@ -54,6 +54,33 @@ All colors MUST be HSL.
     --shadow-glow-purple: 0 0 40px hsl(270 100% 65% / 0.3);
     --shadow-card: 0 8px 32px hsl(280 100% 5% / 0.6);
   }
+
+  @keyframes card-flip {
+    0%, 100% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { filter: drop-shadow(0 0 8px hsl(var(--primary))); }
+    50% { filter: drop-shadow(0 0 16px hsl(var(--primary))); }
+  }
+
+  @keyframes scale-in {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .animate-card-flip {
+    animation: card-flip 20s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
 }
 
 @layer base {

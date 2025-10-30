@@ -12,12 +12,10 @@ export const GameCard = ({ game }: GameCardProps) => {
 
   return (
     <div className="group relative overflow-hidden rounded-xl bg-gradient-card border border-border hover:border-primary/50 transition-all duration-300 animate-slide-in hover:shadow-glow-cyan">
-      <div className="aspect-square overflow-hidden">
-        <img
-          src={game.thumbnail}
-          alt={game.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+      <div className="aspect-square flex items-center justify-center bg-muted/20">
+        <div className="text-9xl group-hover:scale-110 transition-transform duration-500">
+          {game.emoji}
+        </div>
       </div>
       
       <div className="p-6">

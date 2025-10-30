@@ -25,31 +25,31 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 overflow-y-auto p-4">
-      <div className="max-w-4xl mx-auto my-8">
-        <div className="bg-gradient-card border border-border rounded-xl p-6 shadow-card">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground">Edit Rules</h2>
+    <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl max-h-[90vh] flex flex-col">
+        <div className="bg-gradient-card border border-border rounded-xl p-6 shadow-card flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-foreground">Edit Rules</h2>
             <Button
               variant="ghost"
               onClick={onClose}
               className="text-muted-foreground hover:text-foreground"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </Button>
           </div>
 
-          <div className="space-y-4 mb-6">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 overflow-y-auto flex-1 pr-2">
             {editedRules.map((rule, index) => (
-              <div key={index} className="space-y-2">
-                <Label htmlFor={`rule-${index}`} className="text-foreground font-bold">
+              <div key={index} className="space-y-1">
+                <Label htmlFor={`rule-${index}`} className="text-foreground font-bold text-sm">
                   {rule.card}
                 </Label>
                 <Input
                   id={`rule-${index}`}
                   value={rule.rule}
                   onChange={(e) => handleRuleChange(index, e.target.value)}
-                  className="bg-input border-border text-foreground"
+                  className="bg-input border-border text-foreground text-sm"
                 />
               </div>
             ))}
@@ -57,9 +57,9 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
 
           <Button
             onClick={handleSave}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl py-6 shadow-glow-cyan"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-5 shadow-glow-cyan mt-4"
           >
-            <Save className="w-5 h-5 mr-2" />
+            <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
         </div>

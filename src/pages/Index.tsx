@@ -1,6 +1,5 @@
 import { GameCard } from "@/components/GameCard";
 import { games } from "@/data/games";
-import heroImage from "@/assets/kings-cup-hero.jpg";
 import { Sparkles } from "lucide-react";
 
 const Index = () => {
@@ -8,15 +7,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden border-b border-border">
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/10 to-background" />
         
         <div className="relative max-w-6xl mx-auto px-4 py-20 md:py-32 text-center">
           <div className="flex items-center justify-center mb-6 animate-slide-in">

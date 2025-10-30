@@ -2,7 +2,7 @@ export interface Game {
   id: string;
   name: string;
   description: string;
-  thumbnail: string;
+  emoji: string;
   minPlayers: number;
   maxPlayers?: number;
 }
