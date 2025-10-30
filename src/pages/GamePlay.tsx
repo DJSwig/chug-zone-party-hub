@@ -6,6 +6,7 @@ import { ArrowLeft, RotateCcw, Edit, Shuffle } from "lucide-react";
 import { KingsCupRule, Player } from "@/types/game";
 import { PlayerManager } from "@/components/PlayerManager";
 import { RuleEditor } from "@/components/RuleEditor";
+import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
 
 const CARD_DECK = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
@@ -78,7 +79,8 @@ export default function GamePlay() {
   const radius = 180; // radius of the circle
 
   return (
-    <div className="h-screen bg-background flex overflow-hidden">
+    <PageTransition>
+      <div className="h-screen bg-background flex overflow-hidden">
       {/* Left Sidebar - Player List */}
       <div className="w-80 border-r border-border flex flex-col overflow-hidden">
         <div className="p-4 border-b border-border">
@@ -198,7 +200,7 @@ export default function GamePlay() {
               <Button
                 variant="outline"
                 onClick={() => setShowRuleEditor(true)}
-                className="border-primary text-primary hover:bg-primary/10"
+                className="border-primary text-primary hover:bg-primary/10 hover:scale-105 transition-all"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Rules
@@ -207,7 +209,7 @@ export default function GamePlay() {
               <Button
                 onClick={handleDrawCard}
                 disabled={drawnCards.size >= 52}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl px-8 py-6 shadow-glow-cyan hover:shadow-glow-purple transition-all"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl px-8 py-6 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Shuffle className="w-5 h-5 mr-2" />
                 Draw Card
@@ -216,7 +218,7 @@ export default function GamePlay() {
               <Button
                 variant="outline"
                 onClick={handleRestart}
-                className="border-secondary text-secondary hover:bg-secondary/10"
+                className="border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Restart
@@ -240,6 +242,7 @@ export default function GamePlay() {
           onClose={() => setShowRuleEditor(false)}
         />
       )}
-    </div>
+      </div>
+    </PageTransition>
   );
 }

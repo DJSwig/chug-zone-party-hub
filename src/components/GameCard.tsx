@@ -11,9 +11,9 @@ export const GameCard = ({ game }: GameCardProps) => {
   const navigate = useNavigate();
 
   return (
-    <div className="group relative overflow-hidden rounded-xl bg-gradient-card border border-border hover:border-primary/50 transition-all duration-300 animate-slide-in hover:shadow-glow-cyan">
-      <div className="aspect-square flex items-center justify-center bg-muted/20">
-        <div className="text-9xl group-hover:scale-110 transition-transform duration-500">
+    <div className="group relative overflow-hidden rounded-xl bg-gradient-card border border-border hover:border-primary/50 transition-all duration-300 animate-slide-in hover:shadow-glow-cyan hover:scale-105 hover:-rotate-1">
+      <div className="aspect-square flex items-center justify-center bg-muted/20 group-hover:bg-muted/30 transition-all duration-300">
+        <div className="text-8xl group-hover:scale-125 group-hover:animate-glow-pulse transition-all duration-500">
           {game.emoji}
         </div>
       </div>
@@ -37,7 +37,7 @@ export const GameCard = ({ game }: GameCardProps) => {
         
         <Button
           onClick={() => navigate(`/game/${game.id}/settings`)}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-6 shadow-glow-cyan hover:shadow-glow-purple transition-all duration-300"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-6 shadow-glow-cyan hover:shadow-glow-purple transition-all duration-300 hover:scale-105"
         >
           Play Now
         </Button>

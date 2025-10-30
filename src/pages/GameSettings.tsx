@@ -8,6 +8,7 @@ import { ArrowLeft, Edit, Play, Save, Download } from "lucide-react";
 import { kingsCupPresets } from "@/data/kingsCupPresets";
 import { KingsCupRule } from "@/types/game";
 import { RuleEditor } from "@/components/RuleEditor";
+import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
 
 export default function GameSettings() {
@@ -51,8 +52,9 @@ export default function GameSettings() {
   };
 
   return (
-    <div className="min-h-screen h-screen bg-background p-4 flex flex-col overflow-hidden">
-      <div className="max-w-4xl mx-auto flex-1 flex flex-col overflow-hidden">
+    <PageTransition>
+      <div className="min-h-screen h-screen bg-background p-4 flex flex-col overflow-hidden">
+        <div className="max-w-4xl mx-auto flex-1 flex flex-col overflow-hidden">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
@@ -80,10 +82,10 @@ export default function GameSettings() {
                 <button
                   key={preset.name}
                   onClick={() => handlePresetChange(index)}
-                  className={`p-3 rounded-lg border-2 transition-all text-left ${
+                  className={`p-3 rounded-lg border-2 transition-all text-left hover:scale-105 ${
                     selectedPreset === index
                       ? "border-primary bg-primary/10 shadow-glow-cyan"
-                      : "border-border hover:border-primary/50 bg-card"
+                      : "border-border hover:border-primary/50 bg-card hover:shadow-glow-cyan"
                   }`}
                 >
                   <h3 className="text-lg font-bold mb-0.5 text-foreground">{preset.name}</h3>
@@ -102,7 +104,7 @@ export default function GameSettings() {
                   variant="outline"
                   size="sm"
                   onClick={handleSaveGame}
-                  className="border-secondary text-secondary hover:bg-secondary/10"
+                  className="border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
                 >
                   <Save className="w-4 h-4 mr-1" />
                   Save Key
@@ -111,7 +113,7 @@ export default function GameSettings() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowRuleEditor(true)}
-                  className="border-primary text-primary hover:bg-primary/10"
+                  className="border-primary text-primary hover:bg-primary/10 hover:scale-105 transition-all"
                 >
                   <Edit className="w-4 h-4 mr-1" />
                   Edit
@@ -145,7 +147,7 @@ export default function GameSettings() {
               <Button
                 onClick={handleLoadGame}
                 variant="outline"
-                className="border-accent text-accent hover:bg-accent/10"
+                className="border-accent text-accent hover:bg-accent/10 hover:scale-105 transition-all"
               >
                 <Download className="w-4 h-4 mr-1" />
                 Load
@@ -157,7 +159,7 @@ export default function GameSettings() {
         {/* Start Button */}
         <Button
           onClick={handleStartGame}
-          className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold text-xl py-6 shadow-glow-cyan hover:shadow-glow-purple transition-all duration-300 mt-4"
+          className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold text-xl py-6 shadow-glow-cyan hover:shadow-glow-purple hover:scale-105 transition-all duration-300 mt-4"
         >
           <Play className="w-5 h-5 mr-2" />
           Start Game
@@ -174,6 +176,7 @@ export default function GameSettings() {
           onClose={() => setShowRuleEditor(false)}
         />
       )}
-    </div>
+      </div>
+    </PageTransition>
   );
 }
