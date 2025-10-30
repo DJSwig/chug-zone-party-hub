@@ -52,7 +52,7 @@ export const PlayerManager = ({
   };
 
   return (
-    <Card className="p-6 bg-gradient-card border-border h-fit sticky top-8">
+    <Card className="p-6 bg-gradient-card border-border">
       <h2 className="text-2xl font-bold mb-4 text-foreground">Players</h2>
 
       <div className="space-y-3 mb-4">
