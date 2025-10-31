@@ -140,16 +140,18 @@ const HorseRacePlayer = () => {
   };
 
   const updateBet = async (suit: Suit | "", amount: number) => {
-    if (!sessionId || !playerId || !raceState || !betLocked) return;
+    if (!sessionId || !playerId || !raceState) return;
 
     // Unlock the bet when they change it
     const bets = raceState.bets as any[];
+    const existingBet = bets.find(b => b.player_id === playerId);
+    
     const newBets = [
       ...bets.filter(b => b.player_id !== playerId),
       {
         player_id: playerId,
         player_name: playerName,
-        suit: suit || selectedSuit,
+        suit: suit || existingBet?.suit || selectedSuit,
         amount,
         locked: false,
       },
@@ -256,10 +258,13 @@ const HorseRacePlayer = () => {
                     Lock In Bet
                   </Button>
                 ) : (
-                  <div className="p-4 rounded-lg bg-primary/10 border border-primary text-center">
-                    <Check className="inline-block mr-2 h-5 w-5" />
-                    Bet Locked! Waiting for race to start...
-                  </div>
+                  <Button
+                    onClick={placeBet}
+                    disabled={!selectedSuit}
+                    className="w-full bg-primary hover:bg-primary/90"
+                  >
+                    Lock In Bet
+                  </Button>
                 )}
               </div>
             </Card>
