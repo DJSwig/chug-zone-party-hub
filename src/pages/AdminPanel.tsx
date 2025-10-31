@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, UserPlus, UserMinus, Shield, StickyNote } from 'lucide-react';
+import { ArrowLeft, UserPlus, UserMinus, Shield, StickyNote, Database, Trash2, Edit, Plus } from 'lucide-react';
 
 interface User {
   id: string;
@@ -42,6 +42,11 @@ export default function AdminPanel() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [loadingNotes, setLoadingNotes] = useState(true);
   const [discordIdInput, setDiscordIdInput] = useState('');
+  const [tables, setTables] = useState<string[]>([]);
+  const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [loadingTables, setLoadingTables] = useState(false);
+  const [editingRow, setEditingRow] = useState<any>(null);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -55,6 +60,7 @@ export default function AdminPanel() {
       fetchUsers();
       if (isOwner) {
         fetchNotes();
+        fetchTables();
       }
     }
   }, [isAdmin, isOwner]);
@@ -190,6 +196,63 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchTables = async () => {
+    // List all known public tables
+    setTables(['profiles', 'user_roles', 'customizations', 'game_sessions', 'session_players', 'horse_race_state', 'page_notes']);
+  };
+
+  const fetchTableData = async (tableName: string) => {
+    setLoadingTables(true);
+    try {
+      const { data, error } = await (supabase as any)
+        .from(tableName)
+        .select('*')
+        .limit(100);
+
+      if (error) throw error;
+      setTableData(data || []);
+      setSelectedTable(tableName);
+    } catch (error) {
+      console.error('Error fetching table data:', error);
+      toast.error('Failed to load table data');
+    } finally {
+      setLoadingTables(false);
+    }
+  };
+
+  const deleteRow = async (tableName: string, rowId: string) => {
+    try {
+      const { error } = await (supabase as any)
+        .from(tableName)
+        .delete()
+        .eq('id', rowId);
+
+      if (error) throw error;
+      toast.success('Row deleted successfully');
+      fetchTableData(tableName);
+    } catch (error) {
+      console.error('Error deleting row:', error);
+      toast.error('Failed to delete row');
+    }
+  };
+
+  const updateRow = async (tableName: string, rowData: any) => {
+    try {
+      const { error } = await (supabase as any)
+        .from(tableName)
+        .update(rowData)
+        .eq('id', rowData.id);
+
+      if (error) throw error;
+      toast.success('Row updated successfully');
+      setEditingRow(null);
+      fetchTableData(tableName);
+    } catch (error) {
+      console.error('Error updating row:', error);
+      toast.error('Failed to update row');
+    }
+  };
+
   if (loading || !isAdmin) {
     return null;
   }
@@ -221,9 +284,10 @@ export default function AdminPanel() {
           </div>
 
           <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+            <TabsList className={`grid w-full ${isOwner ? 'grid-cols-4' : 'grid-cols-2'} max-w-3xl`}>
               <TabsTrigger value="users">Users & Roles</TabsTrigger>
               {isOwner && <TabsTrigger value="notes">Page Notes</TabsTrigger>}
+              {isOwner && <TabsTrigger value="database">Database</TabsTrigger>}
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
 
@@ -342,6 +406,141 @@ export default function AdminPanel() {
                       ))}
                     </div>
                   )}
+                </Card>
+              </TabsContent>
+            )}
+
+            {isOwner && (
+              <TabsContent value="database" className="space-y-4">
+                <Card className="p-6 bg-card/80 backdrop-blur-sm border-primary/20">
+                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <Database className="w-6 h-6 text-neon-cyan" />
+                    Database Management
+                  </h2>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div className="lg:col-span-1 space-y-2">
+                      <h3 className="font-semibold mb-3">Tables</h3>
+                      {tables.map((table) => (
+                        <Button
+                          key={table}
+                          variant={selectedTable === table ? 'default' : 'outline'}
+                          className="w-full justify-start"
+                          onClick={() => fetchTableData(table)}
+                        >
+                          {table}
+                        </Button>
+                      ))}
+                    </div>
+
+                    <div className="lg:col-span-3">
+                      {loadingTables ? (
+                        <p className="text-muted-foreground">Loading...</p>
+                      ) : selectedTable ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-lg">{selectedTable}</h3>
+                            <span className="text-sm text-muted-foreground">
+                              {tableData.length} rows
+                            </span>
+                          </div>
+
+                          <div className="overflow-x-auto">
+                            <div className="max-h-[600px] overflow-y-auto">
+                              {tableData.length === 0 ? (
+                                <p className="text-muted-foreground">No data in this table</p>
+                              ) : (
+                                <table className="w-full text-sm">
+                                  <thead className="sticky top-0 bg-background border-b">
+                                    <tr>
+                                      {Object.keys(tableData[0]).map((key) => (
+                                        <th key={key} className="text-left p-2 font-semibold">
+                                          {key}
+                                        </th>
+                                      ))}
+                                      <th className="text-left p-2 font-semibold">Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {tableData.map((row, idx) => (
+                                      <tr key={idx} className="border-b hover:bg-muted/50">
+                                        {Object.entries(row).map(([key, value]) => (
+                                          <td key={key} className="p-2">
+                                            {editingRow?.id === row.id ? (
+                                              <Input
+                                                value={editingRow[key] ?? ''}
+                                                onChange={(e) =>
+                                                  setEditingRow({
+                                                    ...editingRow,
+                                                    [key]: e.target.value,
+                                                  })
+                                                }
+                                                className="text-xs"
+                                              />
+                                            ) : (
+                                              <span className="break-all">
+                                                {typeof value === 'object'
+                                                  ? JSON.stringify(value)
+                                                  : String(value ?? '')}
+                                              </span>
+                                            )}
+                                          </td>
+                                        ))}
+                                        <td className="p-2">
+                                          <div className="flex gap-2">
+                                            {editingRow?.id === row.id ? (
+                                              <>
+                                                <Button
+                                                  size="sm"
+                                                  onClick={() =>
+                                                    updateRow(selectedTable, editingRow)
+                                                  }
+                                                >
+                                                  Save
+                                                </Button>
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() => setEditingRow(null)}
+                                                >
+                                                  Cancel
+                                                </Button>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() => setEditingRow(row)}
+                                                >
+                                                  <Edit className="w-3 h-3" />
+                                                </Button>
+                                                <Button
+                                                  size="sm"
+                                                  variant="destructive"
+                                                  onClick={() =>
+                                                    deleteRow(selectedTable, row.id)
+                                                  }
+                                                >
+                                                  <Trash2 className="w-3 h-3" />
+                                                </Button>
+                                              </>
+                                            )}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground">Select a table to view its data</p>
+                      )}
+                    </div>
+                  </div>
                 </Card>
               </TabsContent>
             )}
