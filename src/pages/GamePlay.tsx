@@ -132,20 +132,20 @@ export default function GamePlay() {
     <PageTransition>
       <div className="min-h-screen bg-background flex overflow-y-auto">
       {/* Left Sidebar - Player List */}
-      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-glow-cyan/20">
+      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-glow-cyan/20 transition-all duration-300">
         <div className="p-4 border-b border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate(`/game/${gameId}/settings`)}
-            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            className="w-full justify-start text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Settings
           </Button>
         </div>
         
-        <div className="flex-1 p-4 flex flex-col min-h-0">
+        <div className="flex-1 p-4 flex flex-col min-h-0 overflow-hidden">
           <PlayerManager
             players={players}
             currentPlayerIndex={currentPlayerIndex}

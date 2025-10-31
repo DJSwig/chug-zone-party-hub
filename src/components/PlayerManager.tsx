@@ -58,7 +58,7 @@ export const PlayerManager = ({
   };
 
   return (
-    <Card className="p-6 bg-gradient-card border-border h-full flex flex-col">
+    <Card className="p-5 bg-gradient-card border-border h-full flex flex-col transition-all duration-300">
       <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between flex-shrink-0">
         Players
         <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
@@ -75,13 +75,15 @@ export const PlayerManager = ({
 
       {/* Player Grid - No Scrolling, Expands Vertically Then Horizontally */}
       {players.length > 0 && (
-        <div className={`mb-4 flex-1 transition-all duration-300 ${
-          players.length > 10 ? 'grid grid-cols-2 gap-x-3 gap-y-2 auto-rows-min content-start' : 'flex flex-col gap-2'
+        <div className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
+          players.length > 10 
+            ? 'grid grid-cols-2 gap-x-3 gap-y-2 content-start items-start' 
+            : 'flex flex-col gap-2'
         }`}>
           {players.map((player, index) => (
             <div
               key={player.id}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all relative group ${
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all duration-200 relative group ${
                 index === currentPlayerIndex
                   ? "border-primary bg-primary/10 shadow-glow-cyan"
                   : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-glow-cyan/30"
@@ -110,7 +112,7 @@ export const PlayerManager = ({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemovePlayer(player.id)}
-                className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6"
+                className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </Button>
@@ -119,17 +121,17 @@ export const PlayerManager = ({
         </div>
       )}
 
-      <div className="flex gap-2 flex-shrink-0">
+      <div className="flex gap-2 flex-shrink-0 mt-auto pt-2">
         <Input
           value={newPlayerName}
           onChange={(e) => setNewPlayerName(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && handleAddPlayer()}
           placeholder="New player name"
-          className="bg-input border-border text-foreground"
+          className="bg-input border-border text-foreground transition-colors"
         />
         <Button
           onClick={handleAddPlayer}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0 transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4" />
         </Button>
