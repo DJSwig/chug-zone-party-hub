@@ -90,16 +90,11 @@ export const PlayerManager = ({
               }`}
             >
               <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
                 <Input
                   value={player.name}
                   onChange={(e) => handleNameChange(player.id, e.target.value)}
-                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full"
-                  style={{ 
-                    whiteSpace: 'nowrap',
-                    overflow: 'visible',
-                    textOverflow: 'clip'
-                  }}
+                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full truncate"
                   title={player.name}
                 />
               </div>

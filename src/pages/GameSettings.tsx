@@ -3,11 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Edit, Play, Save, Download } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Play, Save, Download } from "lucide-react";
 import { kingsCupPresets } from "@/data/kingsCupPresets";
 import { KingsCupRule } from "@/types/game";
-import { RuleEditor } from "@/components/RuleEditor";
-import { RuleKeySaver } from "@/components/RuleKeySaver";
 import { PageTransition } from "@/components/PageTransition";
 import { toast } from "sonner";
 
@@ -16,10 +15,9 @@ export default function GameSettings() {
   const navigate = useNavigate();
   const [selectedPreset, setSelectedPreset] = useState(0);
   const [rules, setRules] = useState<KingsCupRule[]>(kingsCupPresets[0].rules);
-  const [showRuleEditor, setShowRuleEditor] = useState(false);
-  const [showKeySaver, setShowKeySaver] = useState(false);
   const [loadKey, setLoadKey] = useState("");
   const [loadedKeyName, setLoadedKeyName] = useState<string | null>(null);
+  const [saveKey, setSaveKey] = useState("");
 
   const handlePresetChange = (index: number) => {
     setSelectedPreset(index);
@@ -56,6 +54,35 @@ export default function GameSettings() {
     }
   };
 
+  const handleSaveCustomKey = () => {
+    if (!saveKey.trim()) {
+      toast.error("Please enter a Rule Key name");
+      return;
+    }
+
+    if (loadedKeyName && saveKey.trim() === loadedKeyName) {
+      toast.error("Cannot overwrite loaded keys. Choose a different name.");
+      return;
+    }
+
+    const existingKey = localStorage.getItem(`ruleset-${saveKey.trim()}`);
+    if (existingKey) {
+      toast.error("This Rule Key already exists. Choose a different name.");
+      return;
+    }
+
+    const encoded = btoa(JSON.stringify(rules));
+    localStorage.setItem(`ruleset-${saveKey.trim()}`, encoded);
+    toast.success(`Rules saved as "${saveKey.trim()}"!`);
+    setSaveKey("");
+  };
+
+  const handleRuleChange = (index: number, newRule: string) => {
+    const updated = [...rules];
+    updated[index] = { ...updated[index], rule: newRule };
+    setRules(updated);
+  };
+
   return (
     <PageTransition>
       <div className="min-h-screen bg-background p-4 md:p-8">
@@ -86,105 +113,98 @@ export default function GameSettings() {
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {/* Left Column */}
-            <div className="space-y-6">
-              {/* Preset Selection */}
-              <Card className="p-6 bg-gradient-card border-border shadow-glow-cyan">
-                <h2 className="text-2xl font-bold mb-4 text-foreground">Choose Ruleset</h2>
-                <div className="grid gap-3">
-                  {kingsCupPresets.map((preset, index) => (
-                    <button
-                      key={preset.name}
-                      onClick={() => handlePresetChange(index)}
-                      className={`p-4 rounded-lg border-2 transition-all text-left hover:scale-105 ${
-                        selectedPreset === index
-                          ? "border-primary bg-primary/10 shadow-glow-cyan"
-                          : "border-border hover:border-primary/50 bg-card hover:shadow-glow-cyan"
-                      }`}
-                    >
-                      <h3 className="text-xl font-bold mb-1 text-foreground">{preset.name}</h3>
-                      <p className="text-sm text-muted-foreground">{preset.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Load/Save Keys */}
-              <Card className="p-6 bg-gradient-card border-border shadow-glow-purple">
-                <h2 className="text-2xl font-bold mb-4 text-foreground">Rule Keys</h2>
-                
-                <div className="space-y-4">
-                  <div className="h-px bg-gradient-primary opacity-30 my-4" />
-                  
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-2 block font-medium">Load Saved Ruleset</label>
-                    <div className="flex gap-2">
-                      <Input
-                        value={loadKey}
-                        onChange={(e) => setLoadKey(e.target.value)}
-                        placeholder="Enter rule key..."
-                        className="bg-input border-border text-foreground"
-                      />
-                      <Button
-                        onClick={handleLoadGame}
-                        variant="outline"
-                        className="border-accent text-accent hover:bg-accent/10 hover:scale-105 transition-all"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="h-px bg-gradient-primary opacity-30 my-4" />
-
-                  <Button
-                    onClick={() => setShowKeySaver(true)}
-                    variant="outline"
-                    className="w-full border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {loadedKeyName ? "Save as New Key" : "Save Custom Key"}
-                  </Button>
-
-                  {loadedKeyName && (
-                    <p className="text-xs text-muted-foreground text-center mt-2 px-2">
-                      💡 Loaded rulesets can't be overwritten — save under a new Rule Key to keep changes.
-                    </p>
-                  )}
-                </div>
-              </Card>
+          {/* Preset Selection */}
+          <Card className="p-6 bg-gradient-card border-border shadow-glow-cyan mb-6">
+            <h2 className="text-2xl font-bold mb-4 text-foreground">Choose Ruleset</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {kingsCupPresets.map((preset, index) => (
+                <button
+                  key={preset.name}
+                  onClick={() => handlePresetChange(index)}
+                  className={`p-4 rounded-lg border-2 transition-all text-left hover:scale-105 ${
+                    selectedPreset === index
+                      ? "border-primary bg-primary/10 shadow-glow-cyan"
+                      : "border-border hover:border-primary/50 bg-card hover:shadow-glow-cyan"
+                  }`}
+                >
+                  <h3 className="text-lg font-bold mb-1 text-foreground">{preset.name}</h3>
+                  <p className="text-xs text-muted-foreground">{preset.description}</p>
+                </button>
+              ))}
             </div>
+          </Card>
 
-            {/* Right Column */}
-            <div>
-              {/* Rule Preview & Edit */}
-              <Card className="p-6 bg-gradient-card border-border shadow-glow-magenta h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-foreground">Current Rules</h2>
+          {/* Inline Rules Editor */}
+          <Card className="p-6 bg-gradient-card border-border shadow-glow-magenta mb-6">
+            <h2 className="text-2xl font-bold mb-4 text-foreground">Edit Rules</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+              {rules.map((rule, index) => (
+                <div key={index} className="space-y-1">
+                  <Label htmlFor={`rule-${index}`} className="text-foreground font-bold text-sm">
+                    {rule.card}
+                  </Label>
+                  <Input
+                    id={`rule-${index}`}
+                    value={rule.rule}
+                    onChange={(e) => handleRuleChange(index, e.target.value)}
+                    className="bg-input border-border text-foreground text-sm hover:border-primary/50 focus:border-primary transition-colors"
+                  />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Save and Load Keys */}
+          <Card className="p-6 bg-gradient-card border-border shadow-glow-purple mb-6">
+            <h2 className="text-2xl font-bold mb-4 text-foreground">Rule Keys</h2>
+            
+            <div className="space-y-4">
+              {/* Save Custom Key */}
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block font-medium">Save Custom Key</label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    value={saveKey}
+                    onChange={(e) => setSaveKey(e.target.value)}
+                    placeholder="Enter new Rule Key name..."
+                    className="bg-input border-border text-foreground"
+                  />
                   <Button
+                    onClick={handleSaveCustomKey}
                     variant="outline"
-                    onClick={() => setShowRuleEditor(true)}
-                    className="border-primary text-primary hover:bg-primary/10 hover:scale-105 transition-all"
+                    className="border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
                   >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Rules
+                    <Save className="w-4 h-4" />
                   </Button>
                 </div>
-                <div className="max-h-[600px] overflow-y-auto space-y-2 custom-scrollbar pr-2">
-                  {rules.map((rule, index) => (
-                    <div
-                      key={index}
-                      className="p-3 rounded-lg bg-muted/50 border border-border hover:border-primary/30 transition-colors"
-                    >
-                      <span className="font-bold text-primary mr-2">{rule.card}:</span>
-                      <span className="text-foreground text-sm">{rule.rule}</span>
-                    </div>
-                  ))}
+                <p className="text-xs text-muted-foreground px-1">
+                  💡 Enter a new Rule Key name to save your custom ruleset. Loaded keys can't be overwritten.
+                </p>
+              </div>
+
+              <div className="h-px bg-gradient-primary opacity-30 my-4" />
+              
+              {/* Load Saved Key */}
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block font-medium">Load Saved Ruleset</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={loadKey}
+                    onChange={(e) => setLoadKey(e.target.value)}
+                    placeholder="Enter rule key..."
+                    className="bg-input border-border text-foreground"
+                  />
+                  <Button
+                    onClick={handleLoadGame}
+                    variant="outline"
+                    className="border-accent text-accent hover:bg-accent/10 hover:scale-105 transition-all"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
                 </div>
-              </Card>
+              </div>
             </div>
-          </div>
+          </Card>
 
           {/* Start Button */}
           <Button
@@ -195,26 +215,6 @@ export default function GameSettings() {
             Start Game
           </Button>
         </div>
-
-        {showRuleEditor && (
-          <RuleEditor
-            rules={rules}
-            onSave={(newRules) => {
-              setRules(newRules);
-              setShowRuleEditor(false);
-              toast.success("Rules updated!");
-            }}
-            onClose={() => setShowRuleEditor(false)}
-          />
-        )}
-
-        {showKeySaver && (
-          <RuleKeySaver
-            rules={rules}
-            onClose={() => setShowKeySaver(false)}
-            loadedKeyName={loadedKeyName}
-          />
-        )}
       </div>
     </PageTransition>
   );

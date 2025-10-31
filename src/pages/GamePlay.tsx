@@ -124,9 +124,9 @@ export default function GamePlay() {
 
   // Create circle of 52 cards
   const totalCards = 52;
-  const centerX = 250; // center X position
-  const centerY = 250; // center Y position
-  const radius = 180; // radius of the circle
+  const centerX = 200; // center X position
+  const centerY = 200; // center Y position
+  const radius = 140; // radius of the circle
 
   return (
     <PageTransition>
@@ -183,9 +183,9 @@ export default function GamePlay() {
         </div>
 
         {/* Card Circle Area */}
-        <div className="flex-1 flex items-center justify-center p-8 relative">
+        <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
           {/* Card Circle */}
-          <div className="relative" style={{ width: '500px', height: '500px' }}>
+          <div className="relative" style={{ width: '400px', height: '400px' }}>
             {Array.from({ length: totalCards }).map((_, i) => {
               const angle = (i / totalCards) * 2 * Math.PI - Math.PI / 2;
               const x = centerX + radius * Math.cos(angle);
@@ -204,10 +204,10 @@ export default function GamePlay() {
                       : "opacity-100"
                   }`}
                   style={{
-                    left: `${x - 24}px`,
-                    top: `${y - 32}px`,
-                    width: '48px',
-                    height: '64px',
+                    left: `${x - 20}px`,
+                    top: `${y - 28}px`,
+                    width: '40px',
+                    height: '56px',
                   }}
                 >
                   <div
@@ -227,24 +227,24 @@ export default function GamePlay() {
                 left: '50%',
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: '240px',
-                height: '240px',
+                width: '200px',
+                height: '200px',
               }}
             >
               <Card className="w-full h-full bg-gradient-card border-primary shadow-glow-cyan flex items-center justify-center">
                 {currentCard ? (
-                  <div className="text-center animate-scale-in px-4">
-                    <div className="text-7xl font-bold mb-3 text-primary animate-glow-pulse">
+                  <div className="text-center animate-scale-in px-3">
+                    <div className="text-6xl font-bold mb-2 text-primary animate-glow-pulse">
                       {currentCard}
                     </div>
-                    <div className="text-sm text-foreground leading-tight">
+                    <div className="text-xs text-foreground leading-tight">
                       {currentRule}
                     </div>
                   </div>
                 ) : (
-                  <div className="text-muted-foreground text-center px-4">
-                    <div className="text-6xl mb-2">👑♣️</div>
-                    <p className="text-sm">Click Draw Card to start!</p>
+                  <div className="text-muted-foreground text-center px-3">
+                    <div className="text-5xl mb-2">👑♣️</div>
+                    <p className="text-xs">Click Draw Card!</p>
                   </div>
                 )}
               </Card>
@@ -253,38 +253,40 @@ export default function GamePlay() {
         </div>
 
         {/* Bottom Controls - Fixed */}
-        <div className="sticky bottom-0 border-t border-border bg-card/95 backdrop-blur-sm p-4 z-10">
-          <div className="max-w-4xl mx-auto flex items-center justify-center gap-4 flex-wrap">
+        <div className="sticky bottom-0 border-t border-border bg-card/95 backdrop-blur-sm p-3 z-10">
+          <div className="max-w-4xl mx-auto flex items-center justify-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <span className="font-bold text-foreground">{52 - drawnCards.size}</span>
               <span>cards remaining</span>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => setShowRuleEditor(true)}
                 className="border-primary text-primary hover:bg-primary/10 hover:scale-105 transition-all"
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Rules
+                <Edit className="w-3.5 h-3.5 mr-1.5" />
+                Edit
               </Button>
 
               <Button
                 onClick={handleDrawCard}
                 disabled={drawnCards.size >= 52 || players.length === 0}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xl px-8 py-6 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed animate-button-pulse"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-6 py-5 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed animate-button-pulse"
               >
-                <Shuffle className="w-5 h-5 mr-2" />
+                <Shuffle className="w-4 h-4 mr-2" />
                 Draw Card
               </Button>
 
               <Button
                 variant="outline"
+                size="sm"
                 onClick={handleRestart}
                 className="border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
+                <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
                 Restart
               </Button>
             </div>
