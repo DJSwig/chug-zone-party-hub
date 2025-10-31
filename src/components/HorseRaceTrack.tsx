@@ -21,36 +21,34 @@ const SUIT_CONFIG = {
 
 export const HorseRaceTrack = ({ progress, finishLine = 8 }: HorseRaceTrackProps) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {(Object.keys(SUIT_CONFIG) as Suit[]).map((suit) => {
         const config = SUIT_CONFIG[suit];
-        const percentage = (progress[suit] / finishLine) * 100;
+        const percentage = Math.min((progress[suit] / finishLine) * 100, 100);
         
         return (
           <div key={suit} className="space-y-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PlayingCard suit={suit} size="sm" />
-                <span className="text-sm font-semibold">{config.name}</span>
+                <span className="text-xs font-semibold">{config.name}</span>
               </div>
               <span className="text-xs text-muted-foreground">
                 {progress[suit]} / {finishLine}
               </span>
             </div>
-            <div className="relative">
-              <Progress value={percentage} className={`h-6 ${config.bgColor}`} />
-              <div 
-                className="absolute top-0 transition-all duration-500 pointer-events-none"
-                style={{ 
-                  left: `calc(${percentage}% - 20px)`,
-                  top: '50%',
-                  transform: 'translateY(-50%)'
-                }}
-              >
-                {progress[suit] > 0 && (
-                  <PlayingCard suit={suit} size="sm" className="shadow-xl" />
-                )}
-              </div>
+            <div className="relative w-full overflow-hidden">
+              <Progress value={percentage} className={`h-5 ${config.bgColor} w-full`} />
+              {progress[suit] > 0 && (
+                <div 
+                  className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 pointer-events-none"
+                  style={{ 
+                    left: `calc(${Math.max(5, Math.min(percentage, 95))}% - 20px)`,
+                  }}
+                >
+                  <PlayingCard suit={suit} size="sm" className="shadow-xl scale-90" />
+                </div>
+              )}
             </div>
           </div>
         );

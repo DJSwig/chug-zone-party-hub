@@ -12,18 +12,18 @@ export const AnimatedDeck = ({ drawnCards, isRacing }: AnimatedDeckProps) => {
   const [showCard, setShowCard] = useState(false);
 
   useEffect(() => {
-    if (drawnCards.length > 0) {
-      const latestCard = drawnCards[drawnCards.length - 1] as Suit;
-      setCurrentCard(latestCard);
-      setShowCard(true);
+    if (drawnCards.length === 0) return;
+    
+    const latestCard = drawnCards[drawnCards.length - 1] as Suit;
+    setCurrentCard(latestCard);
+    setShowCard(true);
 
-      const timer = setTimeout(() => {
-        setShowCard(false);
-      }, 700);
+    const timer = setTimeout(() => {
+      setShowCard(false);
+    }, 700);
 
-      return () => clearTimeout(timer);
-    }
-  }, [drawnCards.length]);
+    return () => clearTimeout(timer);
+  }, [drawnCards]);
 
   return (
     <div className="relative flex items-center justify-center h-32">

@@ -43,7 +43,7 @@ const HorseRaceSettings = () => {
         return;
       }
 
-      // Create initial race state
+      // Create initial race state with consistent odds
       const { error: raceError } = await supabase
         .from("horse_race_state")
         .insert({

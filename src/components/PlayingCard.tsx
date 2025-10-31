@@ -7,10 +7,10 @@ interface PlayingCardProps {
 }
 
 const SUIT_CONFIG = {
-  spades: { symbol: "♠", color: "text-foreground", name: "A" },
-  hearts: { symbol: "♥", color: "text-red-500", name: "A" },
-  diamonds: { symbol: "♦", color: "text-red-500", name: "A" },
-  clubs: { symbol: "♣", color: "text-foreground", name: "A" },
+  spades: { symbol: "♠", color: "text-gray-900", name: "A" },
+  hearts: { symbol: "♥", color: "text-red-600", name: "A" },
+  diamonds: { symbol: "♦", color: "text-red-600", name: "A" },
+  clubs: { symbol: "♣", color: "text-gray-900", name: "A" },
 };
 
 const SIZE_CLASSES = {
@@ -30,16 +30,13 @@ export const PlayingCard = ({ suit, size = "md", className = "" }: PlayingCardPr
   
   return (
     <div
-      className={`${SIZE_CLASSES[size]} bg-white rounded-lg shadow-lg flex flex-col items-center justify-between p-2 ${className}`}
+      className={`${SIZE_CLASSES[size]} bg-white rounded-lg shadow-lg flex flex-col items-center justify-center gap-1 p-2 ${className}`}
     >
       <div className={`${FONT_SIZES[size]} font-bold ${config.color} leading-none`}>
         {config.name}
       </div>
-      <div className={`${FONT_SIZES[size]} ${config.color}`}>
+      <div className={`${FONT_SIZES[size]} ${config.color} leading-none`}>
         {config.symbol}
-      </div>
-      <div className={`${FONT_SIZES[size]} font-bold ${config.color} leading-none`}>
-        {config.name}
       </div>
     </div>
   );
