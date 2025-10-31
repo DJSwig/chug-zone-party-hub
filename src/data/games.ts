@@ -17,4 +17,12 @@ export const games: Game[] = [
     minPlayers: 2,
     maxPlayers: 20,
   },
+  {
+    id: "beer-pong",
+    name: "Beer Pong",
+    description: "Classic beer pong with phone controllers and tournament brackets!",
+    emoji: "🏓🍺",
+    minPlayers: 2,
+    maxPlayers: 16,
+  },
 ];

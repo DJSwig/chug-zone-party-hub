@@ -65,6 +65,8 @@ const Join = () => {
       // Navigate to appropriate player view based on game type
       if (session.game_type === "horse-race") {
         navigate(`/game/horse-race/player/${session.id}/${player.id}`);
+      } else if (session.game_type === "beer-pong") {
+        navigate(`/game/beer-pong/player/${session.id}/${player.id}`);
       }
     } catch (error) {
       console.error("Error joining session:", error);

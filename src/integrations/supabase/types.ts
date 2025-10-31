@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      beer_pong_state: {
+        Row: {
+          bracket_data: Json | null
+          created_at: string
+          current_match_index: number | null
+          current_phase: string
+          game_state: Json
+          mode: string
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          bracket_data?: Json | null
+          created_at?: string
+          current_match_index?: number | null
+          current_phase?: string
+          game_state?: Json
+          mode?: string
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          bracket_data?: Json | null
+          created_at?: string
+          current_match_index?: number | null
+          current_phase?: string
+          game_state?: Json
+          mode?: string
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beer_pong_state_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customizations: {
         Row: {
           card_back_url: string | null

@@ -13,6 +13,8 @@ export const GameCard = ({ game }: GameCardProps) => {
   const handleClick = () => {
     if (game.id === "horse-race") {
       navigate(`/game/horse-race/setup`);
+    } else if (game.id === "beer-pong") {
+      navigate(`/game/beer-pong/setup`);
     } else {
       navigate(`/game/${game.id}/settings`);
     }
