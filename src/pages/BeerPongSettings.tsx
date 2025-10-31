@@ -40,24 +40,33 @@ const BeerPongSettings = () => {
 
       if (sessionError) throw sessionError;
 
-      // Initialize cups in a 10-cup triangle formation
+      // Initialize cups in a 10-cup triangle formation (iMessage style)
       const generateCups = (side: 'left' | 'right') => {
         const cups = [];
         let cupId = 0;
-        const baseX = side === 'left' ? 70 : 30;
         
-        // 4-3-2-1 formation
-        for (let row = 0; row < 4; row++) {
-          const cupsInRow = 4 - row;
-          for (let col = 0; col < cupsInRow; col++) {
+        // Standard 4-3-2-1 triangle formation
+        const rows = [4, 3, 2, 1];
+        const baseY = 20;
+        const rowSpacing = 20;
+        
+        rows.forEach((cupsInRow, rowIndex) => {
+          const startX = side === 'left' ? 15 : 50;
+          const cupSpacing = 18;
+          
+          for (let i = 0; i < cupsInRow; i++) {
+            const x = startX + (i * cupSpacing) - ((cupsInRow - 1) * cupSpacing / 2);
+            const y = baseY + (rowIndex * rowSpacing);
+            
             cups.push({
               id: `${side}-${cupId++}`,
-              x: baseX + (col - cupsInRow / 2) * 8,
-              y: 30 + row * 15,
+              x,
+              y,
               hit: false,
             });
           }
-        }
+        });
+        
         return cups;
       };
 

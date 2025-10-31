@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, UserPlus, UserMinus, Shield, StickyNote, Database, Trash2, Edit, Plus } from 'lucide-react';
+import { ArrowLeft, UserPlus, UserMinus, Shield, StickyNote, Database, Trash2, Edit, Plus, Trophy } from 'lucide-react';
+import { GameConfigManager } from '@/components/GameConfigManager';
 
 interface User {
   id: string;
@@ -198,7 +199,7 @@ export default function AdminPanel() {
 
   const fetchTables = async () => {
     // List all known public tables
-    setTables(['profiles', 'user_roles', 'customizations', 'game_sessions', 'session_players', 'horse_race_state', 'page_notes']);
+    setTables(['profiles', 'user_roles', 'customizations', 'game_sessions', 'session_players', 'horse_race_state', 'beer_pong_state', 'game_configs', 'page_notes']);
   };
 
   const fetchTableData = async (tableName: string) => {
@@ -284,8 +285,9 @@ export default function AdminPanel() {
           </div>
 
           <Tabs defaultValue="users" className="w-full">
-            <TabsList className={`grid w-full ${isOwner ? 'grid-cols-4' : 'grid-cols-2'} max-w-3xl`}>
+            <TabsList className={`grid w-full ${isOwner ? 'grid-cols-5' : 'grid-cols-2'} max-w-4xl`}>
               <TabsTrigger value="users">Users & Roles</TabsTrigger>
+              {isOwner && <TabsTrigger value="games">Game Management</TabsTrigger>}
               {isOwner && <TabsTrigger value="notes">Page Notes</TabsTrigger>}
               {isOwner && <TabsTrigger value="database">Database</TabsTrigger>}
               <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -371,6 +373,23 @@ export default function AdminPanel() {
                 )}
               </Card>
             </TabsContent>
+
+            {isOwner && (
+              <TabsContent value="games" className="space-y-4">
+                <Card className="p-6 bg-card/80 backdrop-blur-sm border-primary/20">
+                  <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <Trophy className="w-6 h-6 text-neon-green" />
+                    Game Management
+                  </h2>
+                  
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Control which games are visible on the homepage
+                  </p>
+
+                  <GameConfigManager />
+                </Card>
+              </TabsContent>
+            )}
 
             {isOwner && (
               <TabsContent value="notes" className="space-y-4">
@@ -547,9 +566,9 @@ export default function AdminPanel() {
 
             <TabsContent value="settings" className="space-y-4">
               <Card className="p-6 bg-card/80 backdrop-blur-sm border-primary/20">
-                <h2 className="text-2xl font-bold mb-4">Site Settings</h2>
+                <h2 className="text-2xl font-bold mb-4">Settings</h2>
                 <p className="text-muted-foreground">
-                  Additional settings coming soon...
+                  Additional settings and configurations coming soon
                 </p>
               </Card>
             </TabsContent>

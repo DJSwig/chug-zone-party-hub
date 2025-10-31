@@ -82,6 +82,24 @@ export type Database = {
         }
         Relationships: []
       }
+      game_configs: {
+        Row: {
+          game_id: string
+          hidden: boolean
+          updated_at: string
+        }
+        Insert: {
+          game_id: string
+          hidden?: boolean
+          updated_at?: string
+        }
+        Update: {
+          game_id?: string
+          hidden?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_sessions: {
         Row: {
           created_at: string

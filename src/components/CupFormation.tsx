@@ -8,8 +8,8 @@ interface CupFormationProps {
 
 export const CupFormation = ({ cups, side, showAnimation = false }: CupFormationProps) => {
   return (
-    <div className={`relative h-full flex items-center justify-center ${side === 'left' ? 'pr-8' : 'pl-8'}`}>
-      <div className="relative w-64 h-80">
+    <div className="relative w-full h-full flex items-center justify-center p-4">
+      <div className="relative" style={{ width: '300px', height: '400px' }}>
         {cups.map((cup) => (
           <div
             key={cup.id}
@@ -25,23 +25,40 @@ export const CupFormation = ({ cups, side, showAnimation = false }: CupFormation
             }}
           >
             <div
-              className={`relative w-14 h-14 rounded-full transition-all duration-300 ${
+              className={`relative transition-all duration-300 ${
                 showAnimation
-                  ? 'border-4 border-primary bg-primary/30 animate-pulse shadow-[0_0_30px_hsl(var(--primary))] scale-110'
-                  : 'border-4 border-primary/70 bg-primary/15 hover:border-primary hover:bg-primary/25 hover:scale-105 shadow-[0_0_15px_hsl(var(--primary)/0.3)]'
+                  ? 'w-16 h-16 animate-pulse shadow-[0_0_40px_hsl(var(--primary))] scale-125'
+                  : 'w-14 h-14 hover:scale-110 shadow-[0_0_20px_hsl(var(--primary)/0.3)]'
               }`}
             >
-              {/* Inner gradient */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/40 via-transparent to-transparent" />
-              
-              {/* Shine effect */}
-              <div className="absolute top-1 left-1 w-3 h-3 rounded-full bg-white/40 blur-sm" />
-              
-              {/* Liquid effect */}
-              <div className="absolute bottom-1 inset-x-1 h-8 rounded-b-full bg-gradient-to-t from-primary/50 to-transparent" />
-              
-              {/* Rim highlight */}
-              <div className="absolute inset-0 rounded-full border-t-2 border-white/20" />
+              {/* Red cup body */}
+              <div className="relative w-full h-full rounded-t-lg">
+                {/* Main cup color - bright red like iMessage */}
+                <div className={`absolute inset-0 rounded-t-lg ${
+                  showAnimation 
+                    ? 'bg-red-500 border-4 border-red-600' 
+                    : 'bg-red-500 border-2 border-red-600'
+                }`}>
+                  {/* Top rim white highlight */}
+                  <div className="absolute top-0 left-0 right-0 h-2 bg-white/30 rounded-t-lg" />
+                  
+                  {/* Middle white line */}
+                  <div className="absolute top-1/3 left-0 right-0 h-1 bg-white/40" />
+                  
+                  {/* Shine effect on left side */}
+                  <div className="absolute top-2 left-1 w-1 h-8 bg-white/50 rounded-full blur-[1px]" />
+                  
+                  {/* Shadow inside cup */}
+                  <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-red-900/40 to-transparent" />
+                </div>
+                
+                {/* Bottom base */}
+                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-12 h-3 ${
+                  showAnimation 
+                    ? 'bg-red-600 border-2 border-red-700' 
+                    : 'bg-red-600 border border-red-700'
+                } rounded-b-full`} />
+              </div>
             </div>
           </div>
         ))}
