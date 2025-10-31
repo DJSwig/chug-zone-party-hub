@@ -18,46 +18,46 @@ const Index = () => {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Glow Background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-[100px]" />
         </div>
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-5xl mx-auto text-center space-y-8">
             {/* Main Headline with Beer Emojis */}
-            <div className="flex items-center justify-center gap-4 mb-4 animate-fade-in">
-              <span className="text-5xl md:text-6xl animate-glow-pulse">🍺</span>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <span className="text-5xl md:text-6xl">🍺</span>
               <h1 className="text-6xl md:text-8xl font-bold leading-tight">
-                <span className="bg-gradient-primary bg-clip-text text-transparent animate-text-glow">
+                <span className="bg-gradient-primary bg-clip-text text-transparent">
                   The Ultimate Drinking Game Hub
                 </span>
               </h1>
-              <span className="text-5xl md:text-6xl animate-glow-pulse" style={{ animationDelay: '0.5s' }}>🍻</span>
+              <span className="text-5xl md:text-6xl">🍻</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
               Play Classic Party Games Online 🎉
             </h2>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
               Stream-optimized drinking games with customizable rules. Perfect for Discord parties, game nights, and unforgettable moments with friends.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
               <Button
                 onClick={scrollToGames}
                 size="lg"
-                className="bg-gradient-primary text-primary-foreground font-bold text-lg px-10 py-6 shadow-glow-emerald hover:scale-110 hover:shadow-[0_0_60px_rgba(16,185,129,0.6)] transition-all duration-300 group"
+                className="bg-gradient-primary text-primary-foreground font-bold text-lg px-10 py-6 hover:scale-105 transition-transform duration-200"
               >
-                <Beer className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                <Beer className="mr-2 h-5 w-5" />
                 Start Playing Now
               </Button>
               
               <Button
                 onClick={() => window.open('https://discord.gg/CmHurTx49j', '_blank')}
                 size="lg"
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-lg px-10 py-6 shadow-[0_0_40px_rgba(88,101,242,0.5)] hover:shadow-[0_0_80px_rgba(88,101,242,0.8)] hover:scale-110 transition-all duration-300"
+                className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-lg px-10 py-6 hover:scale-105 transition-transform duration-200"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
                 Join Discord Community
@@ -65,17 +65,17 @@ const Index = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-              <div className="text-center group hover:scale-110 transition-all duration-300 cursor-default">
-                <div className="text-4xl font-bold text-primary mb-2 group-hover:animate-glow-pulse">{games.length}</div>
+            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12">
+              <div className="text-center group hover:scale-105 transition-transform duration-200 cursor-default">
+                <div className="text-4xl font-bold text-primary mb-2">{games.length}</div>
                 <div className="text-sm text-muted-foreground font-semibold">Party Games</div>
               </div>
-              <div className="text-center group hover:scale-110 transition-all duration-300 cursor-default">
-                <div className="text-4xl font-bold text-primary mb-2 group-hover:animate-glow-pulse">∞</div>
+              <div className="text-center group hover:scale-105 transition-transform duration-200 cursor-default">
+                <div className="text-4xl font-bold text-primary mb-2">∞</div>
                 <div className="text-sm text-muted-foreground font-semibold">Custom Rules</div>
               </div>
-              <div className="text-center group hover:scale-110 transition-all duration-300 cursor-default">
-                <div className="text-4xl font-bold text-primary mb-2 group-hover:animate-glow-pulse">24/7</div>
+              <div className="text-center group hover:scale-105 transition-transform duration-200 cursor-default">
+                <div className="text-4xl font-bold text-primary mb-2">24/7</div>
                 <div className="text-sm text-muted-foreground font-semibold">Always Available</div>
               </div>
             </div>
@@ -93,8 +93,8 @@ const Index = () => {
       {/* Game Showcase Section */}
       <section id="games" className="relative py-20 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 animate-text-glow">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-primary bg-clip-text text-transparent">Choose Your Game</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -103,11 +103,10 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {games.map((game, index) => (
+            {games.map((game) => (
               <div 
                 key={game.id} 
-                className="transform transition-all duration-500 hover:scale-105 hover:z-10 animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="transform transition-transform duration-200 hover:scale-105"
               >
                 <GameCard game={game} />
               </div>
@@ -119,19 +118,19 @@ const Index = () => {
       {/* Discord Community Section */}
       <section className="relative py-20 border-t border-border overflow-hidden">
         <div className="absolute inset-0 bg-[#5865F2]/5 pointer-events-none" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5865F2]/10 rounded-full blur-[120px] animate-glow-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-glow-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5865F2]/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px]" />
         
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto animate-fade-in">
-            <Card className="p-8 md:p-12 bg-gradient-card border-2 border-[#5865F2] shadow-[0_0_60px_rgba(88,101,242,0.4)] backdrop-blur-sm hover:shadow-[0_0_100px_rgba(88,101,242,0.6)] transition-all duration-500">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 md:p-12 bg-gradient-card border-2 border-[#5865F2] backdrop-blur-sm">
               <div className="text-center space-y-8">
-                <div className="inline-block p-5 bg-[#5865F2]/20 rounded-full animate-glow-pulse">
+                <div className="inline-block p-5 bg-[#5865F2]/20 rounded-full">
                   <MessageCircle className="h-16 w-16 text-[#5865F2]" />
                 </div>
                 
                 <div>
-                  <h2 className="text-4xl md:text-6xl font-bold mb-4 animate-text-glow">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-4">
                     Join Our Discord Community
                   </h2>
                   <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -140,20 +139,20 @@ const Index = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 hover:scale-105 transition-all duration-300 group">
-                    <Users className="h-6 w-6 text-[#5865F2] flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 transition-colors duration-200">
+                    <Users className="h-6 w-6 text-[#5865F2] flex-shrink-0" />
                     <span className="text-base font-semibold">Weekly game nights</span>
                   </div>
-                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 hover:scale-105 transition-all duration-300 group">
-                    <Trophy className="h-6 w-6 text-[#5865F2] flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 transition-colors duration-200">
+                    <Trophy className="h-6 w-6 text-[#5865F2] flex-shrink-0" />
                     <span className="text-base font-semibold">Share custom rules</span>
                   </div>
-                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 hover:scale-105 transition-all duration-300 group">
-                    <Gift className="h-6 w-6 text-[#5865F2] flex-shrink-0 group-hover:rotate-12 transition-transform duration-300" />
+                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 transition-colors duration-200">
+                    <Gift className="h-6 w-6 text-[#5865F2] flex-shrink-0" />
                     <span className="text-base font-semibold">Early feature access</span>
                   </div>
-                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 hover:scale-105 transition-all duration-300 group">
-                    <Sparkles className="h-6 w-6 text-[#5865F2] flex-shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                  <div className="flex items-center gap-3 p-5 rounded-lg bg-[#5865F2]/10 border-2 border-[#5865F2]/30 hover:bg-[#5865F2]/20 transition-colors duration-200">
+                    <Sparkles className="h-6 w-6 text-[#5865F2] flex-shrink-0" />
                     <span className="text-base font-semibold">Community events</span>
                   </div>
                 </div>
@@ -162,7 +161,7 @@ const Index = () => {
                   <Button
                     onClick={() => window.open('https://discord.gg/CmHurTx49j', '_blank')}
                     size="lg"
-                    className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-xl px-12 py-7 shadow-[0_0_60px_rgba(88,101,242,0.6)] hover:shadow-[0_0_100px_rgba(88,101,242,0.9)] hover:scale-110 transition-all duration-300"
+                    className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold text-xl px-12 py-7 hover:scale-105 transition-transform duration-200"
                   >
                     <MessageCircle className="mr-3 h-6 w-6" />
                     Join Discord Community
@@ -178,7 +177,7 @@ const Index = () => {
       {/* About Section */}
       <section className="relative py-20 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-6 animate-fade-in">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
             <h3 className="text-3xl md:text-4xl font-bold mb-6">
               Why Choose ChugZone?
             </h3>
@@ -211,7 +210,7 @@ const Index = () => {
                 <Button
                   onClick={() => window.open('https://discord.gg/CmHurTx49j', '_blank')}
                   variant="ghost"
-                  className="text-[#5865F2] hover:text-[#5865F2] hover:bg-[#5865F2]/10 hover:scale-105 transition-all duration-300"
+                  className="text-[#5865F2] hover:text-[#5865F2] hover:bg-[#5865F2]/10 transition-colors duration-200"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Discord
