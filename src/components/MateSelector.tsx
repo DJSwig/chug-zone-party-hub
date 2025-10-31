@@ -13,12 +13,13 @@ import {
 
 interface MateSelectorProps {
   players: Player[];
+  defaultPlayer1Id?: string;
   onConfirm: (player1Id: string, player2Id: string) => void;
   onClose: () => void;
 }
 
-export const MateSelector = ({ players, onConfirm, onClose }: MateSelectorProps) => {
-  const [player1, setPlayer1] = useState<string>("");
+export const MateSelector = ({ players, defaultPlayer1Id, onConfirm, onClose }: MateSelectorProps) => {
+  const [player1, setPlayer1] = useState<string>(defaultPlayer1Id || "");
   const [player2, setPlayer2] = useState<string>("");
 
   const handleConfirm = () => {

@@ -24,6 +24,7 @@ export default function GamePlay() {
   const navigate = useNavigate();
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [lastDrawerIndex, setLastDrawerIndex] = useState<number | null>(null);
   const [rules, setRules] = useState<KingsCupRule[]>([]);
   const [currentCard, setCurrentCard] = useState<string | null>(null);
   const [currentRule, setCurrentRule] = useState<string | null>(null);
@@ -65,13 +66,17 @@ export default function GamePlay() {
     setFlippingCard(cardIndex);
     
     setTimeout(() => {
+      // Save who drew this card
+      const drawerIndex = currentPlayerIndex;
+      setLastDrawerIndex(drawerIndex);
+      
       setCurrentCard(cardType);
       const ruleText = rule?.rule || "No rule found!";
       setCurrentRule(ruleText);
       setDrawnCards(new Set([...drawnCards, cardIndex]));
       setFlippingCard(null);
       
-      toast.success(`${players[currentPlayerIndex].name} drew a ${cardType}!`);
+      toast.success(`${players[drawerIndex].name} drew a ${cardType}!`);
       
       // Check if rule contains "date" or "mate"
       if (ruleText.toLowerCase().includes("date") || ruleText.toLowerCase().includes("mate")) {
@@ -81,7 +86,7 @@ export default function GamePlay() {
       }
       
       // Move to next player
-      const nextIndex = (currentPlayerIndex + 1) % players.length;
+      const nextIndex = (drawerIndex + 1) % players.length;
       setCurrentPlayerIndex(nextIndex);
     }, 300);
   };
@@ -116,6 +121,7 @@ export default function GamePlay() {
     setCurrentCard(null);
     setCurrentRule(null);
     setCurrentPlayerIndex(0);
+    setLastDrawerIndex(null);
     setDrawnCards(new Set());
     setFlippingCard(null);
     setMates([]);
@@ -148,7 +154,7 @@ export default function GamePlay() {
         <div className="flex-1 p-4 flex flex-col min-h-0 overflow-hidden">
           <PlayerManager
             players={players}
-            currentPlayerIndex={currentPlayerIndex}
+            currentPlayerIndex={lastDrawerIndex ?? currentPlayerIndex}
             onPlayersChange={(newPlayers) => {
               // Handle player removal - adjust currentPlayerIndex if needed
               if (newPlayers.length < players.length && newPlayers.length > 0) {
@@ -171,11 +177,11 @@ export default function GamePlay() {
 
       {/* Main Game Area */}
       <div className="flex-1 flex flex-col">
-        {/* Top Bar - Current Player */}
+        {/* Top Bar - Next Turn */}
         <div className="flex items-center justify-center py-4 border-b border-border bg-card/50 sticky top-0 z-10">
           <Card className="px-8 py-3 bg-gradient-card border-primary shadow-glow-cyan">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Current Turn:</span>
+              <span className="text-sm text-muted-foreground">Next Turn:</span>
               <span className="text-3xl font-bold text-primary animate-glow-pulse">
                 {players[currentPlayerIndex]?.name || "Add players to start"}
               </span>
@@ -321,6 +327,7 @@ export default function GamePlay() {
       {showMateSelector && (
         <MateSelector
           players={players}
+          defaultPlayer1Id={lastDrawerIndex !== null ? players[lastDrawerIndex]?.id : undefined}
           onConfirm={handleAddMate}
           onClose={() => setShowMateSelector(false)}
         />
