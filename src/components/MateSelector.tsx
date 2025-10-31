@@ -31,7 +31,7 @@ export const MateSelector = ({ players, defaultPlayer1Id, onConfirm, onClose }: 
 
   return (
     <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-      <Card className="w-full max-w-md bg-gradient-card border-primary shadow-glow-cyan p-6 animate-scale-in">
+      <Card className="w-full max-w-md bg-card border-primary shadow-[0_0_30px_hsl(var(--primary)/0.5)] p-6 animate-scale-in">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-foreground">Select Mates</h2>
           <Button
@@ -79,7 +79,7 @@ export const MateSelector = ({ players, defaultPlayer1Id, onConfirm, onClose }: 
           <Button
             onClick={handleConfirm}
             disabled={!player1 || !player2 || player1 === player2}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 shadow-glow-cyan hover:scale-105 transition-all disabled:opacity-50"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 transition-all disabled:opacity-50"
           >
             Confirm Mates
           </Button>
