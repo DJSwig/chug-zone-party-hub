@@ -3,7 +3,8 @@ import { KingsCupRule } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Save } from "lucide-react";
+import { X, Save, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface RuleEditorProps {
   rules: KingsCupRule[];
@@ -13,6 +14,9 @@ interface RuleEditorProps {
 
 export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
   const [editedRules, setEditedRules] = useState<KingsCupRule[]>(rules);
+  const [customKey, setCustomKey] = useState("");
+  const [keyExists, setKeyExists] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   const handleRuleChange = (index: number, newRule: string) => {
     const updated = [...editedRules];
@@ -20,8 +24,43 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
     setEditedRules(updated);
   };
 
+  const checkKeyAvailability = (key: string) => {
+    if (!key.trim()) {
+      setKeyExists(false);
+      return;
+    }
+    setChecking(true);
+    setTimeout(() => {
+      const trimmedKey = key.trim();
+      const exists = localStorage.getItem(`ruleset-${trimmedKey}`) !== null;
+      setKeyExists(exists);
+      setChecking(false);
+    }, 300);
+  };
+
   const handleSave = () => {
     onSave(editedRules);
+  };
+
+  const handleSaveCustomKey = () => {
+    if (!customKey.trim()) {
+      toast.error("Please enter a rule key name");
+      return;
+    }
+
+    if (keyExists) {
+      toast.error("That Rule Key is already taken. Choose another.");
+      return;
+    }
+
+    const encoded = btoa(JSON.stringify(editedRules));
+    localStorage.setItem(`ruleset-${customKey.trim()}`, encoded);
+    navigator.clipboard.writeText(customKey.trim());
+    toast.success(`Rules saved under '${customKey.trim()}' successfully!`);
+    
+    setTimeout(() => {
+      onClose();
+    }, 1500);
   };
 
   return (
@@ -55,13 +94,61 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
             ))}
           </div>
 
-          <Button
-            onClick={handleSave}
-            className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold text-lg py-5 shadow-glow-cyan hover:shadow-glow-purple hover:scale-105 transition-all mt-4"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Save Changes
-          </Button>
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent my-4" />
+
+          {/* Save Custom Key Section */}
+          <div className="space-y-3 p-4 rounded-lg bg-card/30 border border-primary/20">
+            <div>
+              <Label htmlFor="customKey" className="text-foreground mb-2 block text-sm font-semibold">
+                Save Custom Key
+              </Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Enter a new Rule Key name to save your custom ruleset. Loaded keys can't be overwritten.
+              </p>
+              <Input
+                id="customKey"
+                value={customKey}
+                onChange={(e) => {
+                  setCustomKey(e.target.value);
+                  checkKeyAvailability(e.target.value);
+                }}
+                placeholder="e.g., PARTY2024"
+                className="bg-input border-border text-foreground"
+              />
+              {checking && (
+                <p className="text-xs text-muted-foreground mt-1">Checking availability...</p>
+              )}
+              {keyExists && !checking && (
+                <div className="flex items-center gap-2 mt-2 text-destructive text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>This key is already taken</span>
+                </div>
+              )}
+              {!keyExists && !checking && customKey.trim() && (
+                <p className="text-xs text-primary mt-1">✓ Available</p>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSaveCustomKey}
+                disabled={!customKey.trim() || keyExists || checking}
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 shadow-glow-cyan hover:scale-105 transition-all disabled:opacity-50"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Custom Key
+              </Button>
+
+              <Button
+                onClick={handleSave}
+                className="flex-1 bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold py-3 shadow-glow-purple hover:scale-105 transition-all"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
