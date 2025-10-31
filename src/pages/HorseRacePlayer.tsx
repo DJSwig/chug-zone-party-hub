@@ -84,18 +84,29 @@ const HorseRacePlayer = () => {
             const newState = payload.new as unknown as HorseRaceState;
             setRaceState(newState);
             
-            // Update bet lock status from server
-            const bets = newState.bets as any[];
-            const myBet = bets.find(b => b.player_id === playerId);
-            if (myBet) {
-              setSelectedSuit(myBet.suit);
-              setSelectedAmount(myBet.amount);
-              setBetLocked(myBet.locked || false);
-            } else if (newState.current_phase === "betting") {
-              // Reset if no bet and in betting phase
-              setBetLocked(false);
-              setSelectedSuit("");
-              setSelectedAmount(5);
+            // When phase changes to betting, always reset lock status
+            if (newState.current_phase === "betting") {
+              const bets = newState.bets as any[];
+              const myBet = bets.find(b => b.player_id === playerId);
+              if (myBet) {
+                setSelectedSuit(myBet.suit);
+                setSelectedAmount(myBet.amount);
+                setBetLocked(myBet.locked || false);
+              } else {
+                // Reset if no bet
+                setBetLocked(false);
+                setSelectedSuit("");
+                setSelectedAmount(5);
+              }
+            } else {
+              // For racing/finished phases, update bet lock status
+              const bets = newState.bets as any[];
+              const myBet = bets.find(b => b.player_id === playerId);
+              if (myBet) {
+                setSelectedSuit(myBet.suit);
+                setSelectedAmount(myBet.amount);
+                setBetLocked(myBet.locked || false);
+              }
             }
           }
         }
