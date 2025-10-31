@@ -37,7 +37,17 @@ export const PlayerManager = ({
 
   const handleRemovePlayer = (playerId: string) => {
     const player = players.find((p) => p.id === playerId);
-    onPlayersChange(players.filter((p) => p.id !== playerId));
+    const playerIndex = players.findIndex((p) => p.id === playerId);
+    const newPlayers = players.filter((p) => p.id !== playerId);
+    
+    onPlayersChange(newPlayers);
+    
+    // If we removed the current player, notify parent to adjust currentPlayerIndex
+    if (playerIndex === currentPlayerIndex && newPlayers.length > 0) {
+      // The parent component will need to handle this via the onPlayersChange callback
+      toast.info(`Turn passes to ${newPlayers[currentPlayerIndex % newPlayers.length]?.name}`);
+    }
+    
     toast.success(`${player?.name} left the game`);
   };
 
@@ -65,25 +75,26 @@ export const PlayerManager = ({
         {players.map((player, index) => (
           <div
             key={player.id}
-            className={`flex items-center gap-2 p-3 rounded-lg border transition-all group ${
+            className={`flex items-center gap-2 p-3 rounded-lg border transition-all relative group ${
               index === currentPlayerIndex
                 ? "border-primary bg-primary/10 shadow-glow-cyan"
                 : "border-border bg-muted/30 hover:border-primary/30"
             }`}
           >
             <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <div className="flex-1 min-w-0 relative group">
+            <div className="flex-1 min-w-0">
               <Input
                 value={player.name}
                 onChange={(e) => handleNameChange(player.id, e.target.value)}
-                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 pr-6"
+                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 truncate"
+                title={player.name}
               />
-              {player.name.length > 15 && (
-                <div className="absolute left-0 top-full mt-1 px-2 py-1 bg-popover border border-border rounded-md shadow-lg z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-xs">
-                  {player.name}
-                </div>
-              )}
             </div>
+            {player.name.length > 12 && (
+              <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border border-primary rounded-md shadow-glow-cyan z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                {player.name}
+              </div>
+            )}
             <Button
               variant="ghost"
               size="icon"

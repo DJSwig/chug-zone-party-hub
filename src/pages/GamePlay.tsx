@@ -80,7 +80,9 @@ export default function GamePlay() {
         }, 500);
       }
       
-      setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
+      // Move to next player
+      const nextIndex = (currentPlayerIndex + 1) % players.length;
+      setCurrentPlayerIndex(nextIndex);
     }, 300);
   };
 
@@ -147,7 +149,21 @@ export default function GamePlay() {
           <PlayerManager
             players={players}
             currentPlayerIndex={currentPlayerIndex}
-            onPlayersChange={setPlayers}
+            onPlayersChange={(newPlayers) => {
+              // Handle player removal - adjust currentPlayerIndex if needed
+              if (newPlayers.length < players.length && newPlayers.length > 0) {
+                // A player was removed
+                if (currentPlayerIndex >= newPlayers.length) {
+                  // Current player was at the end, wrap to start
+                  setCurrentPlayerIndex(0);
+                }
+                // If current player was removed from middle, index stays same (next player shifts into position)
+              } else if (newPlayers.length === 0) {
+                // All players removed
+                setCurrentPlayerIndex(0);
+              }
+              setPlayers(newPlayers);
+            }}
           />
         </div>
       </div>

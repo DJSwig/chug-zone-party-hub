@@ -39,7 +39,7 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3 overflow-y-auto flex-1 pr-2">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 overflow-y-auto flex-1 pr-2 custom-scrollbar">
             {editedRules.map((rule, index) => (
               <div key={index} className="space-y-1">
                 <Label htmlFor={`rule-${index}`} className="text-foreground font-bold text-sm">
@@ -49,7 +49,7 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
                   id={`rule-${index}`}
                   value={rule.rule}
                   onChange={(e) => handleRuleChange(index, e.target.value)}
-                  className="bg-input border-border text-foreground text-sm"
+                  className="bg-input border-border text-foreground text-sm hover:border-primary/50 focus:border-primary transition-colors"
                 />
               </div>
             ))}
@@ -57,7 +57,7 @@ export const RuleEditor = ({ rules, onSave, onClose }: RuleEditorProps) => {
 
           <Button
             onClick={handleSave}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-5 shadow-glow-cyan mt-4"
+            className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold text-lg py-5 shadow-glow-cyan hover:shadow-glow-purple hover:scale-105 transition-all mt-4"
           >
             <Save className="w-4 h-4 mr-2" />
             Save Changes
