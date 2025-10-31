@@ -15,6 +15,11 @@ const THEMES = [
   { id: 'purple-haze', name: 'Purple Haze', colors: 'from-purple-600 to-purple-900' },
   { id: 'emerald-glow', name: 'Emerald Glow', colors: 'from-emerald-500 to-emerald-800' },
   { id: 'gold-rush', name: 'Gold Rush', colors: 'from-yellow-400 to-amber-600' },
+  { id: 'halloween', name: 'Halloween', colors: 'from-orange-500 to-purple-700' },
+  { id: 'ocean-deep', name: 'Ocean Deep', colors: 'from-blue-500 to-cyan-600' },
+  { id: 'sunset-blaze', name: 'Sunset Blaze', colors: 'from-orange-500 to-pink-600' },
+  { id: 'midnight-blue', name: 'Midnight Blue', colors: 'from-blue-700 to-indigo-900' },
+  { id: 'cherry-blossom', name: 'Cherry Blossom', colors: 'from-pink-400 to-pink-200' },
 ];
 
 const PREMADE_CARD_BACKS = [
@@ -57,7 +62,7 @@ export default function Customization() {
         .single();
 
       if (data) {
-        setTheme((data.theme as 'classic-neon' | 'purple-haze' | 'emerald-glow' | 'gold-rush') || 'classic-neon');
+        setTheme((data.theme as any) || 'classic-neon');
         setCustomCardBackUrl(data.card_back_url);
         if (data.card_back_url) {
           // Check if it's a premade card back or custom
@@ -244,7 +249,7 @@ export default function Customization() {
               <p className="text-sm text-muted-foreground mb-4">
                 This theme will apply across the entire site
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {THEMES.map((themeOption) => (
                   <button
                     key={themeOption.id}
