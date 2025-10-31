@@ -10,9 +10,10 @@ import { toast } from "sonner";
 interface RuleKeySaverProps {
   rules: KingsCupRule[];
   onClose: () => void;
+  loadedKeyName?: string | null;
 }
 
-export const RuleKeySaver = ({ rules, onClose }: RuleKeySaverProps) => {
+export const RuleKeySaver = ({ rules, onClose, loadedKeyName }: RuleKeySaverProps) => {
   const [customKey, setCustomKey] = useState("");
   const [keyExists, setKeyExists] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -22,11 +23,12 @@ export const RuleKeySaver = ({ rules, onClose }: RuleKeySaverProps) => {
       setKeyExists(false);
       return;
     }
-    
     setChecking(true);
     setTimeout(() => {
-      const existingKey = localStorage.getItem(`ruleset-${key}`);
-      setKeyExists(!!existingKey);
+      const trimmedKey = key.trim();
+      const exists = localStorage.getItem(`ruleset-${trimmedKey}`) !== null;
+      const isSameAsLoaded = loadedKeyName && trimmedKey === loadedKeyName;
+      setKeyExists(exists && !isSameAsLoaded);
       setChecking(false);
     }, 300);
   };
@@ -64,9 +66,19 @@ export const RuleKeySaver = ({ rules, onClose }: RuleKeySaverProps) => {
         </div>
 
         <div className="space-y-4">
+          {loadedKeyName && (
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary">
+              <p className="text-sm text-foreground">
+                Currently loaded: <span className="font-bold text-primary">{loadedKeyName}</span>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                You must create a new key name to save your changes.
+              </p>
+            </div>
+          )}
           <div>
             <Label htmlFor="customKey" className="text-foreground mb-2 block">
-              Custom Rule Key
+              {loadedKeyName ? "New Rule Key Name" : "Custom Rule Key"}
             </Label>
             <Input
               id="customKey"

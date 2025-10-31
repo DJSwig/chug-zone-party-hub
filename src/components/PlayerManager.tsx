@@ -61,31 +61,36 @@ export const PlayerManager = ({
         </div>
       )}
 
-      <div className={`grid gap-3 mb-4 ${
-        players.length > 6 ? 'grid-cols-2' : 'grid-cols-1'
-      }`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
         {players.map((player, index) => (
           <div
             key={player.id}
-            className={`flex items-center gap-2 p-2 rounded-lg border transition-all ${
+            className={`flex items-center gap-2 p-3 rounded-lg border transition-all group ${
               index === currentPlayerIndex
                 ? "border-primary bg-primary/10 shadow-glow-cyan"
-                : "border-border bg-muted/30"
+                : "border-border bg-muted/30 hover:border-primary/30"
             }`}
           >
-            <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-            <Input
-              value={player.name}
-              onChange={(e) => handleNameChange(player.id, e.target.value)}
-              className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1"
-            />
+            <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <div className="flex-1 min-w-0 relative group">
+              <Input
+                value={player.name}
+                onChange={(e) => handleNameChange(player.id, e.target.value)}
+                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 pr-6"
+              />
+              {player.name.length > 15 && (
+                <div className="absolute left-0 top-full mt-1 px-2 py-1 bg-popover border border-border rounded-md shadow-lg z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-xs">
+                  {player.name}
+                </div>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => handleRemovePlayer(player.id)}
-              className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6"
+              className="flex-shrink-0 text-muted-foreground hover:text-destructive h-7 w-7"
             >
-              <X className="w-3 h-3" />
+              <X className="w-4 h-4" />
             </Button>
           </div>
         ))}
