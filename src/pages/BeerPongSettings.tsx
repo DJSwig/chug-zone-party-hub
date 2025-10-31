@@ -99,7 +99,7 @@ const BeerPongSettings = () => {
       if (stateError) throw stateError;
 
       toast.success("Game session created!");
-      navigate(`/beer-pong/host/${session.id}`);
+      navigate(`/game/beer-pong/host/${session.id}`);
     } catch (error) {
       console.error("Error creating session:", error);
       toast.error("Failed to create session");
