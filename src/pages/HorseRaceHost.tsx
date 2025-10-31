@@ -10,8 +10,8 @@ import { ParticleBackground } from "@/components/ParticleBackground";
 import { JoinCodeDisplay } from "@/components/JoinCodeDisplay";
 import { HorseRaceTrack } from "@/components/HorseRaceTrack";
 import { useGameSession } from "@/hooks/useGameSession";
-import { HorseRaceBet, HorseRaceState, Suit } from "@/types/multiplayer";
-import { ArrowLeft, Play, RotateCcw, Trophy } from "lucide-react";
+import { HorseRaceBet, HorseRaceState, Suit, SessionPlayer } from "@/types/multiplayer";
+import { ArrowLeft, Play, RotateCcw, Trophy, Plus, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SUIT_EMOJIS = {
@@ -21,6 +21,7 @@ const SUIT_EMOJIS = {
   clubs: "♣️",
 };
 
+const BET_AMOUNTS = [1, 5, 10, 15, 20];
 const FINISH_LINE = 8;
 
 const HorseRaceHost = () => {
@@ -30,6 +31,7 @@ const HorseRaceHost = () => {
   const [raceState, setRaceState] = useState<HorseRaceState | null>(null);
   const [racing, setRacing] = useState(false);
   const [showVictory, setShowVictory] = useState(false);
+  const [newPlayerName, setNewPlayerName] = useState("");
 
   useEffect(() => {
     if (!sessionId) return;
@@ -48,7 +50,6 @@ const HorseRaceHost = () => {
 
     fetchRaceState();
 
-    // Subscribe to race state updates
     const channel = supabase
       .channel(`race-state-${sessionId}`)
       .on(
@@ -72,6 +73,76 @@ const HorseRaceHost = () => {
     };
   }, [sessionId]);
 
+  const handleAddPlayer = async () => {
+    if (!newPlayerName.trim() || !sessionId) return;
+
+    const { error } = await supabase
+      .from("session_players")
+      .insert({
+        session_id: sessionId,
+        player_name: newPlayerName.trim(),
+        player_data: { manual: true },
+      });
+
+    if (error) {
+      toast.error("Failed to add player");
+      return;
+    }
+
+    setNewPlayerName("");
+    toast.success(`${newPlayerName.trim()} added!`);
+  };
+
+  const handleRemovePlayer = async (playerId: string) => {
+    const { error } = await supabase
+      .from("session_players")
+      .delete()
+      .eq("id", playerId);
+
+    if (error) {
+      toast.error("Failed to remove player");
+      return;
+    }
+
+    // Remove their bet too
+    if (raceState && sessionId) {
+      const bets = (raceState.bets as HorseRaceBet[]).filter(b => b.player_id !== playerId);
+      await supabase
+        .from("horse_race_state")
+        .update({ bets: bets as any })
+        .eq("session_id", sessionId);
+    }
+
+    toast.success("Player removed");
+  };
+
+  const handleSetBet = async (playerId: string, playerName: string, suit: Suit | null, amount: number) => {
+    if (!sessionId || !raceState) return;
+
+    const bets = raceState.bets as HorseRaceBet[];
+    
+    if (!suit) {
+      // Remove bet
+      const newBets = bets.filter(b => b.player_id !== playerId);
+      await supabase
+        .from("horse_race_state")
+        .update({ bets: newBets as any })
+        .eq("session_id", sessionId);
+      return;
+    }
+
+    // Update or add bet
+    const newBets = [
+      ...bets.filter(b => b.player_id !== playerId),
+      { player_id: playerId, player_name: playerName, suit, amount },
+    ];
+
+    await supabase
+      .from("horse_race_state")
+      .update({ bets: newBets as any })
+      .eq("session_id", sessionId);
+  };
+
   const startRace = async () => {
     if (!sessionId || !raceState) return;
 
@@ -83,19 +154,16 @@ const HorseRaceHost = () => {
 
     setRacing(true);
 
-    // Update session status
     await supabase
       .from("game_sessions")
       .update({ status: "active" })
       .eq("id", sessionId);
 
-    // Update race phase
     await supabase
       .from("horse_race_state")
       .update({ current_phase: "racing" })
       .eq("session_id", sessionId);
 
-    // Simulate race
     simulateRace();
   };
 
@@ -151,15 +219,14 @@ const HorseRaceHost = () => {
   const resetRace = async () => {
     if (!sessionId || !raceState) return;
 
-    // Adjust odds based on winner
+    const suits: Suit[] = ["spades", "hearts", "diamonds", "clubs"];
     const newOdds = { ...raceState.odds };
     if (raceState.winner) {
       const winner = raceState.winner as Suit;
-      // Decrease winner's odds, increase others slightly
       newOdds[winner] = Math.max(1, newOdds[winner] - 0.5);
       suits.forEach((suit) => {
         if (suit !== winner) {
-          newOdds[suit as Suit] = Math.min(5, newOdds[suit as Suit] + 0.2);
+          newOdds[suit] = Math.min(5, newOdds[suit] + 0.2);
         }
       });
     }
@@ -197,72 +264,164 @@ const HorseRaceHost = () => {
   const winningSuit = raceState.winner as Suit | null;
   const winners = winningSuit ? bets.filter(bet => bet.suit === winningSuit) : [];
 
+  // Sort: manual players first, then by join time
+  const sortedPlayers = [...players].sort((a, b) => {
+    const aManual = (a.player_data as any)?.manual;
+    const bManual = (b.player_data as any)?.manual;
+    if (aManual && !bManual) return -1;
+    if (!aManual && bManual) return 1;
+    return new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime();
+  });
+
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="h-screen bg-background relative overflow-hidden flex flex-col">
       <ParticleBackground />
       
-      <div className="container mx-auto px-4 py-6 relative z-10">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/")}
-          className="mb-4 hover:bg-primary/10"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Exit
-        </Button>
+      <div className="container mx-auto px-4 py-3 relative z-10 flex-1 flex flex-col min-h-0">
+        <div className="flex items-center justify-between mb-3">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="hover:bg-primary/10"
+            size="sm"
+          >
+            <ArrowLeft className="mr-2 h-3 w-3" />
+            Exit
+          </Button>
+          <JoinCodeDisplay joinCode={session.join_code} />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: Join Code & Players */}
-          <div className="space-y-6">
-            <JoinCodeDisplay joinCode={session.join_code} />
+        <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-4 flex-1 min-h-0">
+          {/* Left: Players & Controls */}
+          <div className="flex flex-col min-h-0">
+            <Card className="p-4 bg-gradient-card border-border flex-1 flex flex-col min-h-0">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Players ({players.length})</h2>
+              </div>
 
-            <Card className="p-5 bg-gradient-card border-border">
-              <h2 className="text-xl font-bold mb-4">
-                Players ({players.length})
-              </h2>
-              {players.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Waiting for players...</p>
-              ) : (
-                <div className="space-y-2">
-                  {players.map((player) => {
+              {/* Add Player */}
+              <div className="flex gap-2 mb-3">
+                <Input
+                  value={newPlayerName}
+                  onChange={(e) => setNewPlayerName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddPlayer()}
+                  placeholder="Add player..."
+                  className="text-sm h-8"
+                />
+                <Button
+                  onClick={handleAddPlayer}
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 h-8 px-2"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {/* Players List */}
+              <div className="space-y-2 overflow-y-auto flex-1 min-h-0 pr-1">
+                {sortedPlayers.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Add players or wait for joins...</p>
+                ) : (
+                  sortedPlayers.map((player) => {
                     const bet = bets.find(b => b.player_id === player.id);
+                    const isManual = (player.player_data as any)?.manual;
+                    
                     return (
                       <div
                         key={player.id}
-                        className="px-3 py-2 rounded-lg border border-border bg-muted/30"
+                        className={`p-2 rounded-lg border ${
+                          isManual 
+                            ? "border-primary/50 bg-primary/5" 
+                            : "border-border bg-muted/30"
+                        }`}
                       >
-                        <div className="font-medium">{player.player_name}</div>
-                        {bet && (
-                          <div className="text-xs text-muted-foreground">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="font-medium text-sm flex items-center gap-2">
+                            {player.player_name}
+                            {isManual && <span className="text-xs text-primary">(host)</span>}
+                          </div>
+                          {raceState.current_phase === "betting" && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleRemovePlayer(player.id)}
+                              className="h-6 w-6 hover:text-destructive"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          )}
+                        </div>
+
+                        {raceState.current_phase === "betting" && (
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <Select
+                              value={bet?.suit || ""}
+                              onValueChange={(v) => handleSetBet(player.id, player.player_name, v as Suit, bet?.amount || 5)}
+                            >
+                              <SelectTrigger className="h-7 text-xs">
+                                <SelectValue placeholder="Suit" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {suits.map((suit) => (
+                                  <SelectItem key={suit} value={suit}>
+                                    {SUIT_EMOJIS[suit]} {suit}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <Select
+                              value={bet?.amount?.toString() || "5"}
+                              onValueChange={(v) => handleSetBet(player.id, player.player_name, bet?.suit || null, parseInt(v))}
+                              disabled={!bet?.suit}
+                            >
+                              <SelectTrigger className="h-7 text-xs">
+                                <SelectValue placeholder="Amount" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {BET_AMOUNTS.map((amount) => (
+                                  <SelectItem key={amount} value={amount.toString()}>
+                                    {amount}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {bet && raceState.current_phase !== "betting" && (
+                          <div className="text-xs text-muted-foreground mt-1">
                             {SUIT_EMOJIS[bet.suit]} × {bet.amount} drinks
                           </div>
                         )}
                       </div>
                     );
-                  })}
-                </div>
-              )}
+                  })
+                )}
+              </div>
             </Card>
           </div>
 
-          {/* Center: Race Track */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="p-6 bg-gradient-card border-border">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">🐎 Race Track</h2>
-                <div className="text-sm text-muted-foreground">
+          {/* Right: Race Track & Odds */}
+          <div className="flex flex-col gap-4 min-h-0">
+            <Card className="p-4 bg-gradient-card border-border flex-1 flex flex-col min-h-0">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xl font-bold">🐎 Race Track</h2>
+                <div className="text-xs text-muted-foreground">
                   {raceState.current_phase === "betting" && "Betting Phase"}
                   {raceState.current_phase === "racing" && "Racing!"}
                   {raceState.current_phase === "finished" && "Race Complete"}
                 </div>
               </div>
 
-              <HorseRaceTrack 
-                progress={raceState.race_progress}
-                finishLine={FINISH_LINE}
-              />
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                <HorseRaceTrack 
+                  progress={raceState.race_progress}
+                  finishLine={FINISH_LINE}
+                />
+              </div>
 
-              <div className="mt-6 flex gap-3">
+              <div className="mt-3 flex gap-2">
                 {raceState.current_phase === "betting" && (
                   <Button
                     onClick={startRace}
@@ -285,14 +444,14 @@ const HorseRaceHost = () => {
               </div>
             </Card>
 
-            {/* Odds Display */}
-            <Card className="p-5 bg-gradient-card border-border">
-              <h3 className="text-lg font-bold mb-3">Current Odds</h3>
-              <div className="grid grid-cols-4 gap-3">
+            {/* Compact Odds Display */}
+            <Card className="p-3 bg-gradient-card border-border">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm font-bold">Odds:</span>
                 {suits.map((suit) => (
-                  <div key={suit} className="text-center p-3 rounded-lg bg-muted/30 border border-border">
-                    <div className="text-2xl mb-1">{SUIT_EMOJIS[suit]}</div>
-                    <div className="text-sm font-semibold">{raceState.odds[suit]}:1</div>
+                  <div key={suit} className="flex items-center gap-1">
+                    <span className="text-xl">{SUIT_EMOJIS[suit]}</span>
+                    <span className="text-xs font-semibold">{raceState.odds[suit]}:1</span>
                   </div>
                 ))}
               </div>

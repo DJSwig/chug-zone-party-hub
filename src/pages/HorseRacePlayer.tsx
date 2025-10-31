@@ -117,7 +117,7 @@ const HorseRacePlayer = () => {
 
     const { error } = await supabase
       .from("horse_race_state")
-      .update({ bets: newBets })
+      .update({ bets: newBets as any })
       .eq("session_id", sessionId);
 
     if (error) {
