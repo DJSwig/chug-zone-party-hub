@@ -47,11 +47,20 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(142 76% 45%), hsl(217 91% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(217 91% 60%), hsl(142 76% 45%));
     --gradient-card: linear-gradient(135deg, hsl(222 47% 14% / 0.8), hsl(217 33% 17% / 0.6));
+    --gradient-hero: linear-gradient(135deg, hsl(277 85% 60%), hsl(142 76% 45%));
+    --gradient-neon: linear-gradient(90deg, hsl(277 85% 60%), hsl(142 76% 45%), hsl(217 91% 60%));
 
-    /* Shadows */
+    /* Shadows & Glows */
     --shadow-glow-emerald: 0 0 30px hsl(142 76% 45% / 0.3);
     --shadow-glow-slate: 0 0 30px hsl(217 91% 60% / 0.3);
+    --shadow-glow-purple: 0 0 40px hsl(277 85% 60% / 0.4);
+    --shadow-glow-cyan: 0 0 35px hsl(185 100% 50% / 0.35);
     --shadow-card: 0 8px 32px hsl(222 47% 8% / 0.5);
+    
+    /* Neon Colors */
+    --neon-purple: 277 85% 60%;
+    --neon-green: 142 76% 45%;
+    --neon-cyan: 185 100% 50%;
   }
 
   @keyframes card-flip {
