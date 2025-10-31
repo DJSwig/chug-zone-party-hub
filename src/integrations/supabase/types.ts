@@ -14,7 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_sessions: {
+        Row: {
+          created_at: string
+          game_type: string
+          host_name: string
+          id: string
+          join_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_type: string
+          host_name: string
+          id?: string
+          join_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_type?: string
+          host_name?: string
+          id?: string
+          join_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      horse_race_state: {
+        Row: {
+          bets: Json | null
+          current_phase: string
+          drawn_cards: string[] | null
+          odds: Json | null
+          race_progress: Json | null
+          session_id: string
+          updated_at: string
+          winner: string | null
+        }
+        Insert: {
+          bets?: Json | null
+          current_phase?: string
+          drawn_cards?: string[] | null
+          odds?: Json | null
+          race_progress?: Json | null
+          session_id: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Update: {
+          bets?: Json | null
+          current_phase?: string
+          drawn_cards?: string[] | null
+          odds?: Json | null
+          race_progress?: Json | null
+          session_id?: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "horse_race_state_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_players: {
+        Row: {
+          id: string
+          joined_at: string
+          player_data: Json | null
+          player_name: string
+          session_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          player_data?: Json | null
+          player_name: string
+          session_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          player_data?: Json | null
+          player_name?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_players_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
