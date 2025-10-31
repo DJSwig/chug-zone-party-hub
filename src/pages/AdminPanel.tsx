@@ -142,7 +142,7 @@ export default function AdminPanel() {
         .single();
 
       if (!profile) {
-        toast.error('User not found with that Discord ID');
+        toast.error('User not found. They must log in at least once before being made an admin.');
         return;
       }
 
@@ -237,6 +237,9 @@ export default function AdminPanel() {
                 {isOwner && (
                   <div className="mb-6 p-4 rounded-lg bg-background/50 border border-primary/10">
                     <h3 className="font-semibold mb-3">Add Admin by Discord ID</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Note: Users must have logged in at least once before they can be made an admin.
+                    </p>
                     <div className="flex gap-2">
                       <Input
                         value={discordIdInput}
