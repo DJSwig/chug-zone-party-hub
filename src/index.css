@@ -83,6 +83,10 @@ All colors MUST be HSL.
     animation: card-draw 0.8s ease-out;
   }
 
+  .delay-1000 {
+    animation-delay: 1s;
+  }
+
   @keyframes glow-pulse {
     0%, 100% { filter: drop-shadow(0 0 8px hsl(var(--primary))); }
     50% { filter: drop-shadow(0 0 16px hsl(var(--primary))); }
