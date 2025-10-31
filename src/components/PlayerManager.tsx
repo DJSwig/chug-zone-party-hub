@@ -58,20 +58,25 @@ export const PlayerManager = ({
   };
 
   return (
-    <Card className="p-6 bg-gradient-card border-border">
+    <Card className="p-6 bg-gradient-card border-border h-full flex flex-col">
       <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between">
         Players
         <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
       </h2>
 
       {players.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          <p className="text-sm mb-2">No players yet</p>
-          <p className="text-xs">Add players below to start!</p>
+        <div className="text-center py-8 text-muted-foreground flex-1 flex items-center justify-center">
+          <div>
+            <p className="text-sm mb-2">No players yet</p>
+            <p className="text-xs">Add players below to start!</p>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+      {/* Player Grid - Expands Vertically First */}
+      <div className={`mb-4 flex-1 overflow-y-auto custom-scrollbar ${
+        players.length > 12 ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'
+      }`}>
         {players.map((player, index) => (
           <div
             key={player.id}
@@ -86,12 +91,17 @@ export const PlayerManager = ({
               <Input
                 value={player.name}
                 onChange={(e) => handleNameChange(player.id, e.target.value)}
-                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 truncate"
+                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 w-full"
+                style={{ 
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
                 title={player.name}
               />
             </div>
             {player.name.length > 12 && (
-              <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border border-primary rounded-md shadow-glow-cyan z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+              <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-glow-cyan z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
                 {player.name}
               </div>
             )}
