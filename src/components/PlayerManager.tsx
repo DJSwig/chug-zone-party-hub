@@ -122,7 +122,7 @@ export const PlayerManager = ({
       {/* Player Grid - No Scrolling, Expands Vertically Then Horizontally */}
       {players.length > 0 && (
         <div className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
-          players.length > 10 
+          players.length > 8 
             ? 'grid grid-cols-2 gap-x-3 gap-y-2 content-start items-start' 
             : 'flex flex-col gap-2'
         }`}>
