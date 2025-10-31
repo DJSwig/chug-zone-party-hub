@@ -1,5 +1,6 @@
 import { Suit } from "@/types/multiplayer";
 import { Progress } from "@/components/ui/progress";
+import { PlayingCard } from "./PlayingCard";
 
 interface HorseRaceTrackProps {
   progress: {
@@ -12,41 +13,43 @@ interface HorseRaceTrackProps {
 }
 
 const SUIT_CONFIG = {
-  spades: { emoji: "♠️", name: "Spades", color: "text-foreground" },
-  hearts: { emoji: "♥️", name: "Hearts", color: "text-red-500" },
-  diamonds: { emoji: "♦️", name: "Diamonds", color: "text-red-500" },
-  clubs: { emoji: "♣️", name: "Clubs", color: "text-foreground" },
+  spades: { name: "Spades", bgColor: "bg-slate-700/30" },
+  hearts: { name: "Hearts", bgColor: "bg-red-900/30" },
+  diamonds: { name: "Diamonds", bgColor: "bg-red-900/30" },
+  clubs: { name: "Clubs", bgColor: "bg-slate-700/30" },
 };
 
 export const HorseRaceTrack = ({ progress, finishLine = 8 }: HorseRaceTrackProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {(Object.keys(SUIT_CONFIG) as Suit[]).map((suit) => {
         const config = SUIT_CONFIG[suit];
         const percentage = (progress[suit] / finishLine) * 100;
         
         return (
-          <div key={suit} className="space-y-2">
+          <div key={suit} className="space-y-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={`text-3xl ${config.color}`}>{config.emoji}</span>
-                <span className="text-lg font-semibold">{config.name}</span>
+                <PlayingCard suit={suit} size="sm" />
+                <span className="text-sm font-semibold">{config.name}</span>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {progress[suit]} / {finishLine}
               </span>
             </div>
             <div className="relative">
-              <Progress value={percentage} className="h-8" />
+              <Progress value={percentage} className={`h-6 ${config.bgColor}`} />
               <div 
-                className="absolute top-0 text-2xl transition-all duration-500"
+                className="absolute top-0 transition-all duration-500 pointer-events-none"
                 style={{ 
-                  left: `calc(${percentage}% - 16px)`,
+                  left: `calc(${percentage}% - 20px)`,
                   top: '50%',
                   transform: 'translateY(-50%)'
                 }}
               >
-                {config.emoji}
+                {progress[suit] > 0 && (
+                  <PlayingCard suit={suit} size="sm" className="shadow-xl" />
+                )}
               </div>
             </div>
           </div>

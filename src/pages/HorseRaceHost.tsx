@@ -9,16 +9,18 @@ import { toast } from "sonner";
 import { ParticleBackground } from "@/components/ParticleBackground";
 import { JoinCodeDisplay } from "@/components/JoinCodeDisplay";
 import { HorseRaceTrack } from "@/components/HorseRaceTrack";
+import { AnimatedDeck } from "@/components/AnimatedDeck";
+import { PlayingCard } from "@/components/PlayingCard";
 import { useGameSession } from "@/hooks/useGameSession";
 import { HorseRaceBet, HorseRaceState, Suit, SessionPlayer } from "@/types/multiplayer";
 import { ArrowLeft, Play, RotateCcw, Trophy, Plus, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const SUIT_EMOJIS = {
-  spades: "♠️",
-  hearts: "♥️",
-  diamonds: "♦️",
-  clubs: "♣️",
+const SUIT_NAMES = {
+  spades: "Spades",
+  hearts: "Hearts",
+  diamonds: "Diamonds",
+  clubs: "Clubs",
 };
 
 const BET_AMOUNTS = [1, 5, 10, 15, 20];
@@ -364,7 +366,7 @@ const HorseRaceHost = () => {
                               <SelectContent>
                                 {suits.map((suit) => (
                                   <SelectItem key={suit} value={suit}>
-                                    {SUIT_EMOJIS[suit]} {suit}
+                                    {SUIT_NAMES[suit]}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -390,8 +392,9 @@ const HorseRaceHost = () => {
                         )}
 
                         {bet && raceState.current_phase !== "betting" && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {SUIT_EMOJIS[bet.suit]} × {bet.amount} drinks
+                          <div className="flex items-center gap-2 mt-1">
+                            <PlayingCard suit={bet.suit} size="sm" className="scale-75" />
+                            <span className="text-xs text-muted-foreground">× {bet.amount} drinks</span>
                           </div>
                         )}
                       </div>
@@ -403,10 +406,10 @@ const HorseRaceHost = () => {
           </div>
 
           {/* Right: Race Track & Odds */}
-          <div className="flex flex-col gap-4 min-h-0">
+          <div className="flex flex-col gap-3 min-h-0">
             <Card className="p-4 bg-gradient-card border-border flex-1 flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xl font-bold">🐎 Race Track</h2>
+                <h2 className="text-lg font-bold">🏁 Race Track</h2>
                 <div className="text-xs text-muted-foreground">
                   {raceState.current_phase === "betting" && "Betting Phase"}
                   {raceState.current_phase === "racing" && "Racing!"}
@@ -414,11 +417,22 @@ const HorseRaceHost = () => {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto">
-                <HorseRaceTrack 
-                  progress={raceState.race_progress}
-                  finishLine={FINISH_LINE}
-                />
+              <div className="grid grid-cols-[180px_1fr] gap-4 items-center flex-1 min-h-0">
+                {/* Deck */}
+                <div className="flex items-center justify-center">
+                  <AnimatedDeck 
+                    drawnCards={raceState.drawn_cards}
+                    isRacing={raceState.current_phase === "racing"}
+                  />
+                </div>
+
+                {/* Track */}
+                <div className="overflow-y-auto pr-2">
+                  <HorseRaceTrack 
+                    progress={raceState.race_progress}
+                    finishLine={FINISH_LINE}
+                  />
+                </div>
               </div>
 
               <div className="mt-3 flex gap-2">
@@ -445,12 +459,12 @@ const HorseRaceHost = () => {
             </Card>
 
             {/* Compact Odds Display */}
-            <Card className="p-3 bg-gradient-card border-border">
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm font-bold">Odds:</span>
+            <Card className="p-2 bg-gradient-card border-border">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-bold">Odds:</span>
                 {suits.map((suit) => (
                   <div key={suit} className="flex items-center gap-1">
-                    <span className="text-xl">{SUIT_EMOJIS[suit]}</span>
+                    <PlayingCard suit={suit} size="sm" className="scale-75" />
                     <span className="text-xs font-semibold">{raceState.odds[suit]}:1</span>
                   </div>
                 ))}
@@ -464,9 +478,10 @@ const HorseRaceHost = () => {
       <Dialog open={showVictory} onOpenChange={setShowVictory}>
         <DialogContent className="bg-gradient-card border-2 border-primary">
           <DialogHeader>
-            <DialogTitle className="text-center text-3xl">
-              <Trophy className="inline-block mr-2 h-8 w-8 text-primary" />
-              {winningSuit && SUIT_EMOJIS[winningSuit]} Wins!
+            <DialogTitle className="text-center text-3xl flex items-center justify-center gap-3">
+              <Trophy className="h-8 w-8 text-primary" />
+              {winningSuit && <PlayingCard suit={winningSuit} size="md" />}
+              Wins!
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">

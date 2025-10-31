@@ -110,9 +110,8 @@ export default {
         'gradient-card': 'var(--gradient-card)',
       },
       boxShadow: {
-        'glow-cyan': 'var(--shadow-glow-cyan)',
-        'glow-magenta': 'var(--shadow-glow-magenta)',
-        'glow-purple': 'var(--shadow-glow-purple)',
+        'glow-emerald': 'var(--shadow-glow-emerald)',
+        'glow-slate': 'var(--shadow-glow-slate)',
         'card': 'var(--shadow-card)',
       },
     },

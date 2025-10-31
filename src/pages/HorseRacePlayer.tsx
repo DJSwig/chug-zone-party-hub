@@ -7,14 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ParticleBackground } from "@/components/ParticleBackground";
 import { HorseRaceTrack } from "@/components/HorseRaceTrack";
+import { PlayingCard } from "@/components/PlayingCard";
+import { AnimatedDeck } from "@/components/AnimatedDeck";
 import { HorseRaceState, Suit } from "@/types/multiplayer";
 import { Check, Trophy } from "lucide-react";
 
-const SUIT_CONFIG = {
-  spades: { emoji: "♠️", name: "Spades" },
-  hearts: { emoji: "♥️", name: "Hearts" },
-  diamonds: { emoji: "♦️", name: "Diamonds" },
-  clubs: { emoji: "♣️", name: "Clubs" },
+const SUIT_NAMES = {
+  spades: "Spades",
+  hearts: "Hearts",
+  diamonds: "Diamonds",
+  clubs: "Clubs",
 };
 
 const BET_AMOUNTS = [1, 5, 10, 15, 20];
@@ -168,14 +170,14 @@ const HorseRacePlayer = () => {
                         key={suit}
                         onClick={() => !betLocked && setSelectedSuit(suit)}
                         disabled={betLocked}
-                        className={`p-4 rounded-lg border-2 transition-all ${
+                        className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center ${
                           selectedSuit === suit
-                            ? "border-primary bg-primary/10 shadow-glow-cyan"
+                            ? "border-primary bg-primary/10 shadow-glow-emerald"
                             : "border-border bg-muted/30 hover:border-primary/50"
                         } ${betLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                       >
-                        <div className="text-4xl mb-2">{SUIT_CONFIG[suit].emoji}</div>
-                        <div className="font-semibold">{SUIT_CONFIG[suit].name}</div>
+                        <PlayingCard suit={suit} size="md" className="mb-2" />
+                        <div className="font-semibold">{SUIT_NAMES[suit]}</div>
                         <div className="text-xs text-muted-foreground">
                           {raceState.odds[suit]}:1 odds
                         </div>
@@ -231,11 +233,10 @@ const HorseRacePlayer = () => {
                 finishLine={FINISH_LINE}
               />
               {myBet && (
-                <div className="mt-4 text-center p-3 rounded-lg bg-muted/30 border border-border">
+                <div className="mt-4 flex items-center justify-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
                   <div className="text-sm text-muted-foreground">Your Bet:</div>
-                  <div className="text-lg font-bold">
-                    {SUIT_CONFIG[myBet.suit as Suit].emoji} {myBet.amount} drinks
-                  </div>
+                  <PlayingCard suit={myBet.suit as Suit} size="sm" />
+                  <div className="text-lg font-bold">× {myBet.amount} drinks</div>
                 </div>
               )}
             </Card>
@@ -246,9 +247,10 @@ const HorseRacePlayer = () => {
             <Card className="p-6 bg-gradient-card border-2 border-primary">
               <div className="text-center space-y-4">
                 <Trophy className="inline-block h-16 w-16 text-primary" />
-                <h2 className="text-3xl font-bold">
-                  {winningSuit && SUIT_CONFIG[winningSuit].emoji} {winningSuit && SUIT_CONFIG[winningSuit].name} Wins!
-                </h2>
+                <div className="flex items-center justify-center gap-3">
+                  {winningSuit && <PlayingCard suit={winningSuit} size="lg" />}
+                  <h2 className="text-3xl font-bold">{winningSuit && SUIT_NAMES[winningSuit]} Wins!</h2>
+                </div>
                 
                 {didIWin ? (
                   <div className="p-6 rounded-lg bg-primary/10 border border-primary">
