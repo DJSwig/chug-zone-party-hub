@@ -59,7 +59,13 @@ export default function Customization() {
         setTheme((data.theme as 'classic-neon' | 'purple-haze' | 'emerald-glow' | 'gold-rush') || 'classic-neon');
         setCustomCardBackUrl(data.card_back_url);
         if (data.card_back_url) {
-          setSelectedCardBack('custom');
+          // Check if it's a premade card back or custom
+          const premade = PREMADE_CARD_BACKS.find(cb => cb.preview === data.card_back_url);
+          if (premade) {
+            setSelectedCardBack(premade.id);
+          } else {
+            setSelectedCardBack('custom');
+          }
         }
       }
     } catch (error) {
@@ -118,7 +124,16 @@ export default function Customization() {
   const saveCustomizations = async () => {
     setSaving(true);
     try {
-      const cardBackUrl = selectedCardBack === 'custom' ? customCardBackUrl : null;
+      let cardBackUrl = null;
+      if (selectedCardBack === 'custom') {
+        cardBackUrl = customCardBackUrl;
+      } else {
+        // Find the premade card back URL
+        const premade = PREMADE_CARD_BACKS.find(cb => cb.id === selectedCardBack);
+        if (premade) {
+          cardBackUrl = premade.preview;
+        }
+      }
 
       console.log('Saving customizations:', {
         user_id: user?.id,

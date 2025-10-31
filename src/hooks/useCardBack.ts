@@ -23,7 +23,7 @@ export function useCardBack() {
         .eq('user_id', user?.id)
         .single();
 
-      if (data?.card_back_url && /^https?:\/\//i.test(data.card_back_url)) {
+      if (data?.card_back_url && (data.card_back_url.startsWith('/') || /^https?:\/\//i.test(data.card_back_url))) {
         setCardBackUrl(data.card_back_url);
       } else {
         setCardBackUrl(null);
