@@ -9,5 +9,12 @@ export const games: Game[] = [
     minPlayers: 2,
     maxPlayers: 12,
   },
-  // More games coming soon!
+  {
+    id: "horse-race",
+    name: "Horse Race",
+    description: "Bet on suits, watch the race unfold, and dish out drinks!",
+    emoji: "🐎🏁",
+    minPlayers: 2,
+    maxPlayers: 20,
+  },
 ];

@@ -10,9 +10,17 @@ interface GameCardProps {
 export const GameCard = ({ game }: GameCardProps) => {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    if (game.id === "horse-race") {
+      navigate(`/game/horse-race/setup`);
+    } else {
+      navigate(`/game/${game.id}/settings`);
+    }
+  };
+
   return (
     <div 
-      onClick={() => navigate(`/game/${game.id}/settings`)}
+      onClick={handleClick}
       className="group relative overflow-hidden rounded-xl bg-gradient-card border-2 border-border hover:border-primary transition-all duration-300 animate-slide-in hover:shadow-glow-cyan hover:scale-[1.02] cursor-pointer p-5"
     >
       <div className="flex flex-col items-center text-center">
