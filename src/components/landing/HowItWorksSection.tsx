@@ -6,22 +6,19 @@ export const HowItWorksSection = () => {
       icon: Gamepad2,
       title: "Choose Your Game",
       description: "Pick from classics like King's Cup or explore new party games",
-      color: "hsl(var(--neon-purple))",
-      glow: "shadow-glow-purple"
+      color: "hsl(var(--primary))",
     },
     {
       icon: Users,
       title: "Add Your Friends",
       description: "Share a join code and get everyone in the virtual room",
-      color: "hsl(var(--neon-green))",
-      glow: "shadow-glow-emerald"
+      color: "hsl(var(--secondary))",
     },
     {
       icon: PartyPopper,
       title: "Start the Party",
       description: "Draw cards, follow rules, and let the good times roll",
-      color: "hsl(var(--neon-cyan))",
-      glow: "shadow-glow-cyan"
+      color: "hsl(var(--accent))",
     }
   ];
 
@@ -65,8 +62,11 @@ export const HowItWorksSection = () => {
                   </div>
 
                   {/* Icon */}
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[var(--color)]/10 mb-6 ${step.glow} group-hover:scale-110 transition-transform`}
-                    style={{ '--color': step.color } as React.CSSProperties}
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[var(--color)]/10 mb-6 group-hover:scale-110 transition-transform"
+                    style={{ 
+                      '--color': step.color,
+                      boxShadow: `0 0 30px ${step.color}40`
+                    } as React.CSSProperties}
                   >
                     <Icon className="h-10 w-10" style={{ color: step.color }} />
                   </div>

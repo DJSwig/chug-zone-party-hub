@@ -104,7 +104,7 @@ export const PlayerManager = ({
   };
 
   return (
-    <Card className="p-5 bg-gradient-card border-border h-full flex flex-col transition-all duration-300">
+    <Card className="p-5 bg-card border-border h-full flex flex-col transition-all duration-300">
       <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between flex-shrink-0">
         Players
         <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
@@ -136,8 +136,8 @@ export const PlayerManager = ({
               onDragEnd={handleDragEnd}
               className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
                 index === currentPlayerIndex
-                  ? "border-primary bg-primary/10 shadow-glow-cyan"
-                  : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-glow-cyan/30"
+                  ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
+                  : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
               } ${
                 draggedIndex === index ? "opacity-50" : ""
               } ${
@@ -156,7 +156,7 @@ export const PlayerManager = ({
                 />
               </div>
               {player.name.length > 15 && (
-                <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-glow-cyan z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
                   {player.name}
                 </div>
               )}

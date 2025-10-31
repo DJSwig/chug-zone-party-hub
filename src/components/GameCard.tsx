@@ -21,7 +21,7 @@ export const GameCard = ({ game }: GameCardProps) => {
   return (
     <div 
       onClick={handleClick}
-      className="group relative overflow-hidden rounded-xl bg-gradient-card border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-[1.02] cursor-pointer h-full"
+      className="group relative overflow-hidden rounded-xl bg-card border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-[1.02] cursor-pointer h-full"
     >
       {/* Glow Effect on Hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-transparent transition-all duration-500" />
