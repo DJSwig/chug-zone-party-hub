@@ -29,16 +29,16 @@ const Join = () => {
     setLoading(true);
 
     try {
-      // Find session
+      // Find session (allow joining active sessions too)
       const { data: session, error: sessionError } = await supabase
         .from("game_sessions")
         .select("*")
         .eq("join_code", joinCode.toUpperCase())
-        .eq("status", "waiting")
+        .in("status", ["waiting", "active"])
         .single();
 
       if (sessionError || !session) {
-        toast.error("Session not found or already started");
+        toast.error("Session not found");
         setLoading(false);
         return;
       }

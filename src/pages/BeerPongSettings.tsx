@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ParticleBackground } from "@/components/ParticleBackground";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Users, Trophy, Loader2 } from "lucide-react";
 import { generateJoinCode } from "@/utils/joinCodeGenerator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -109,25 +109,26 @@ const BeerPongSettings = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-primary/5">
       <ParticleBackground />
       
       <div className="relative z-10 w-full max-w-2xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-4"
+          className="mb-4 hover:bg-primary/10"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Games
         </Button>
 
-        <Card className="p-8 bg-gradient-card border-primary/20 shadow-glow-cyan">
+        <Card className="p-8 bg-gradient-card border-2 border-primary/20 shadow-glow-cyan">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">
-              🏓 Beer Pong
+            <div className="text-6xl mb-4 animate-bounce">🏓</div>
+            <h1 className="text-5xl font-bold mb-3 text-gradient">
+              Beer Pong
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-lg">
               Set up your game and get ready to play!
             </p>
           </div>
@@ -135,47 +136,93 @@ const BeerPongSettings = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold mb-2 text-primary">
-                Your Name
+                Host Name
               </label>
               <Input
                 value={hostName}
                 onChange={(e) => setHostName(e.target.value)}
                 placeholder="Enter your name"
-                className="text-lg"
+                className="text-lg h-12"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-primary">
+              <label className="block text-sm font-semibold mb-3 text-primary">
                 Game Mode
               </label>
               <Select value={mode} onValueChange={(value: 'head_to_head' | 'tournament') => setMode(value)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-12 text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="head_to_head">Head-to-Head</SelectItem>
-                  <SelectItem value="tournament">Tournament (4-16 players)</SelectItem>
+                  <SelectItem value="head_to_head">
+                    <div className="flex items-center gap-3 py-2">
+                      <Users className="w-5 h-5 text-primary" />
+                      <div className="text-left">
+                        <div className="font-semibold">Head-to-Head</div>
+                        <div className="text-xs text-muted-foreground">2 players or teams</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="tournament">
+                    <div className="flex items-center gap-3 py-2">
+                      <Trophy className="w-5 h-5 text-primary" />
+                      <div className="text-left">
+                        <div className="font-semibold">Tournament</div>
+                        <div className="text-xs text-muted-foreground">4-16 players, bracket style</div>
+                      </div>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="bg-background/50 p-4 rounded-lg border border-primary/10">
-              <h3 className="font-semibold mb-2 text-primary">How to Play</h3>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li>• Players connect with their phones to control shots</li>
-                <li>• Adjust power and angle, then throw the ball</li>
-                <li>• Hit all opponent's cups to win</li>
-                <li>• Tournament mode: Compete in bracket-style elimination</li>
+            <Card className="p-5 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <h3 className="font-semibold mb-3 text-primary flex items-center gap-2">
+                <span className="text-xl">🎮</span> How to Play
+              </h3>
+              <ul className="space-y-2 text-sm text-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Players connect with their phones to control shots</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Adjust power and angle, then throw the ball</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Hit all opponent's cups to win</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  <span>Host can test shots solo before players join</span>
+                </li>
+                {mode === 'tournament' && (
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">•</span>
+                    <span>Compete in bracket-style elimination rounds</span>
+                  </li>
+                )}
               </ul>
-            </div>
+            </Card>
 
             <Button
               onClick={handleCreateSession}
               disabled={creating}
-              className="w-full text-lg font-bold py-6"
+              className="w-full text-lg font-bold py-7 shadow-glow-cyan hover:scale-105 transition-transform"
+              size="lg"
             >
-              {creating ? "Creating..." : "Create Game Session"}
+              {creating ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Creating Session...
+                </>
+              ) : (
+                <>
+                  🎮 Create Game Session
+                </>
+              )}
             </Button>
           </div>
         </Card>
