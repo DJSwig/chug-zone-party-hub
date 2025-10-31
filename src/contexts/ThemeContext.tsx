@@ -118,6 +118,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user) {
       fetchTheme();
+    } else {
+      // Reset to default theme when user signs out
+      setThemeState('classic-neon');
     }
   }, [user]);
 
