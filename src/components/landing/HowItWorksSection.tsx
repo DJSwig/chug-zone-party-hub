@@ -60,7 +60,7 @@ export const HowItWorksSection = () => {
                   } as React.CSSProperties}
                 >
                   {/* Step number */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center text-2xl font-black text-white shadow-glow-purple">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-2xl font-black text-primary-foreground">
                     {index + 1}
                   </div>
 

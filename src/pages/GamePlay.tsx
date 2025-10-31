@@ -9,6 +9,7 @@ import { RuleEditor } from "@/components/RuleEditor";
 import { HostPanel } from "@/components/HostPanel";
 import { MateSelector } from "@/components/MateSelector";
 import { PageTransition } from "@/components/PageTransition";
+import { useCardBack } from "@/hooks/useCardBack";
 import { toast } from "sonner";
 
 interface Mate {
@@ -22,6 +23,7 @@ const CARD_DECK = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", 
 export default function GamePlay() {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  const { cardBackUrl } = useCardBack();
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [lastDrawerIndex, setLastDrawerIndex] = useState<number | null>(null);
@@ -130,9 +132,9 @@ export default function GamePlay() {
 
   // Create circle of 52 cards
   const totalCards = 52;
-  const centerX = 200; // center X position
-  const centerY = 200; // center Y position
-  const radius = 140; // radius of the circle
+  const centerX = 275; // center X position
+  const centerY = 275; // center Y position
+  const radius = 220; // radius of the circle
 
   return (
     <PageTransition>
@@ -192,7 +194,7 @@ export default function GamePlay() {
         {/* Card Circle Area */}
         <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
           {/* Card Circle */}
-          <div className="relative" style={{ width: '400px', height: '400px' }}>
+          <div className="relative" style={{ width: '550px', height: '550px' }}>
             {Array.from({ length: totalCards }).map((_, i) => {
               const angle = (i / totalCards) * 2 * Math.PI - Math.PI / 2;
               const x = centerX + radius * Math.cos(angle);
@@ -211,18 +213,29 @@ export default function GamePlay() {
                       : "opacity-100"
                   }`}
                   style={{
-                    left: `${x - 20}px`,
-                    top: `${y - 28}px`,
-                    width: '40px',
-                    height: '56px',
+                    left: `${x - 30}px`,
+                    top: `${y - 42}px`,
+                    width: '60px',
+                    height: '84px',
                   }}
                 >
-                  <div
-                    className="w-full h-full rounded-md bg-gradient-primary shadow-card"
-                    style={{
-                      transform: `rotate(${(i / totalCards) * 360}deg)`,
-                    }}
-                  />
+                  {cardBackUrl ? (
+                    <img
+                      src={cardBackUrl}
+                      alt="Card back"
+                      className="w-full h-full rounded-md shadow-card object-cover"
+                      style={{
+                        transform: `rotate(${(i / totalCards) * 360}deg)`,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full rounded-md bg-gradient-to-br from-primary via-secondary to-accent shadow-card"
+                      style={{
+                        transform: `rotate(${(i / totalCards) * 360}deg)`,
+                      }}
+                    />
+                  )}
                 </div>
               );
             })}

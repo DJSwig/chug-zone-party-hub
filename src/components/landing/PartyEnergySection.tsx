@@ -3,33 +3,33 @@ import { MessageCircle, Zap, Heart, Star } from "lucide-react";
 
 export const PartyEnergySection = () => {
   const partyMoments = [
-    { emoji: "🍻", text: "Cheers!", color: "hsl(var(--neon-green))" },
-    { emoji: "😂", text: "Hilarious Rules", color: "hsl(var(--neon-cyan))" },
-    { emoji: "👑", text: "King's Cup Pro", color: "hsl(var(--neon-purple))" },
-    { emoji: "🎉", text: "Party Time!", color: "hsl(var(--neon-green))" },
-    { emoji: "🔥", text: "On Fire!", color: "hsl(var(--neon-cyan))" },
-    { emoji: "💯", text: "Epic Game", color: "hsl(var(--neon-purple))" },
-    { emoji: "🚀", text: "Next Level", color: "hsl(var(--neon-green))" },
-    { emoji: "⚡", text: "High Energy", color: "hsl(var(--neon-cyan))" },
+    { emoji: "🍻", text: "Cheers!", color: "hsl(var(--secondary))" },
+    { emoji: "😂", text: "Hilarious Rules", color: "hsl(var(--accent))" },
+    { emoji: "👑", text: "King's Cup Pro", color: "hsl(var(--primary))" },
+    { emoji: "🎉", text: "Party Time!", color: "hsl(var(--secondary))" },
+    { emoji: "🔥", text: "On Fire!", color: "hsl(var(--accent))" },
+    { emoji: "💯", text: "Epic Game", color: "hsl(var(--primary))" },
+    { emoji: "🚀", text: "Next Level", color: "hsl(var(--secondary))" },
+    { emoji: "⚡", text: "High Energy", color: "hsl(var(--accent))" },
   ];
 
   return (
     <section className="relative py-32 border-t border-border/50 overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[hsl(var(--neon-cyan))] rounded-full blur-[120px] opacity-10 animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[hsl(var(--neon-purple))] rounded-full blur-[120px] opacity-10 animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-0 left-0 w-96 h-96 bg-accent rounded-full blur-[120px] opacity-10 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary rounded-full blur-[120px] opacity-10 animate-pulse" style={{ animationDelay: '1.5s' }} />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="text-center mb-20">
           <h2 className="text-5xl md:text-6xl font-black mb-6">
-            <span className="bg-gradient-neon bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               Bring the Bar Games
             </span>
           </h2>
           <p className="text-2xl font-bold mb-4">
-            <span className="text-[hsl(var(--neon-purple))]">To Your Screen</span>
+            <span className="text-primary">To Your Screen</span>
           </p>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of players creating unforgettable party moments
@@ -59,20 +59,20 @@ export const PartyEnergySection = () => {
 
         {/* Community features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
-          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-[hsl(var(--neon-purple))]/30 hover:border-[hsl(var(--neon-purple))] transition-all hover:scale-105 shadow-glow-purple">
-            <Zap className="h-12 w-12 mx-auto mb-4 text-[hsl(var(--neon-purple))]" />
+          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-primary/30 hover:border-primary transition-all hover:scale-105">
+            <Zap className="h-12 w-12 mx-auto mb-4 text-primary" />
             <h3 className="text-2xl font-bold mb-2 text-foreground">Instant Setup</h3>
             <p className="text-muted-foreground">No downloads or accounts needed. Just click and play.</p>
           </div>
 
-          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-[hsl(var(--neon-green))]/30 hover:border-[hsl(var(--neon-green))] transition-all hover:scale-105 shadow-glow-emerald">
-            <Heart className="h-12 w-12 mx-auto mb-4 text-[hsl(var(--neon-green))]" />
+          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-secondary/30 hover:border-secondary transition-all hover:scale-105">
+            <Heart className="h-12 w-12 mx-auto mb-4 text-secondary" />
             <h3 className="text-2xl font-bold mb-2 text-foreground">Share the Fun</h3>
             <p className="text-muted-foreground">Send a join code and bring everyone together online.</p>
           </div>
 
-          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-[hsl(var(--neon-cyan))]/30 hover:border-[hsl(var(--neon-cyan))] transition-all hover:scale-105 shadow-glow-cyan">
-            <Star className="h-12 w-12 mx-auto mb-4 text-[hsl(var(--neon-cyan))]" />
+          <div className="text-center p-8 rounded-2xl bg-card/30 backdrop-blur-sm border border-accent/30 hover:border-accent transition-all hover:scale-105">
+            <Star className="h-12 w-12 mx-auto mb-4 text-accent" />
             <h3 className="text-2xl font-bold mb-2 text-foreground">Always Free</h3>
             <p className="text-muted-foreground">No premium tiers. Full features for everyone, forever.</p>
           </div>

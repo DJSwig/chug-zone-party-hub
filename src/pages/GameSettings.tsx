@@ -97,7 +97,7 @@ export default function GameSettings() {
           </Button>
 
           <div className="text-center mb-8 animate-slide-in">
-            <h1 className="text-5xl md:text-6xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent animate-text-glow">
+            <h1 className="text-5xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               King's Cup
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -114,7 +114,7 @@ export default function GameSettings() {
           )}
 
           {/* Preset Selection */}
-          <Card className="p-6 bg-gradient-card border-border shadow-glow-cyan mb-6">
+          <Card className="p-6 bg-card/80 backdrop-blur-sm border-border mb-6">
             <h2 className="text-2xl font-bold mb-4 text-foreground">Choose Ruleset</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {kingsCupPresets.map((preset, index) => (
@@ -135,7 +135,7 @@ export default function GameSettings() {
           </Card>
 
           {/* Inline Rules Editor */}
-          <Card className="p-6 bg-gradient-card border-border shadow-glow-magenta mb-6">
+          <Card className="p-6 bg-card/80 backdrop-blur-sm border-border mb-6">
             <h2 className="text-2xl font-bold mb-4 text-foreground">Edit Rules</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
               {rules.map((rule, index) => (
@@ -155,7 +155,7 @@ export default function GameSettings() {
           </Card>
 
           {/* Save and Load Keys */}
-          <Card className="p-6 bg-gradient-card border-border shadow-glow-purple mb-6">
+          <Card className="p-6 bg-card/80 backdrop-blur-sm border-border mb-6">
             <h2 className="text-2xl font-bold mb-4 text-foreground">Rule Keys</h2>
             
             <div className="space-y-4">
@@ -182,7 +182,7 @@ export default function GameSettings() {
                 </p>
               </div>
 
-              <div className="h-px bg-gradient-primary opacity-30 my-4" />
+              <div className="h-px bg-gradient-to-r from-primary to-secondary opacity-30 my-4" />
               
               {/* Load Saved Key */}
               <div>
@@ -209,7 +209,7 @@ export default function GameSettings() {
           {/* Start Button */}
           <Button
             onClick={handleStartGame}
-            className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold text-2xl py-8 shadow-glow-cyan hover:shadow-glow-purple hover:scale-105 active:scale-95 transition-all duration-300 animate-button-pulse"
+            className="w-full bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 text-primary-foreground font-bold text-2xl py-8 hover:scale-105 active:scale-95 transition-all duration-300"
           >
             <Play className="w-6 h-6 mr-3" />
             Start Game
