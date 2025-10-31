@@ -82,25 +82,33 @@ export default function Customization() {
 
     setUploading(true);
     try {
+      console.log('Uploading file:', file.name, 'Size:', file.size);
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+
+      console.log('Upload path:', fileName);
 
       const { error: uploadError } = await supabase.storage
         .from('card-backs')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('card-backs')
         .getPublicUrl(fileName);
 
+      console.log('Public URL:', publicUrl);
       setCustomCardBackUrl(publicUrl);
       setSelectedCardBack('custom');
       toast.success('Card back uploaded!');
     } catch (error) {
       console.error('Error uploading file:', error);
-      toast.error('Failed to upload card back');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload card back';
+      toast.error(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -111,7 +119,13 @@ export default function Customization() {
     try {
       const cardBackUrl = selectedCardBack === 'custom' ? customCardBackUrl : selectedCardBack;
 
-      const { error } = await supabase
+      console.log('Saving customizations:', {
+        user_id: user?.id,
+        theme: theme,
+        card_back_url: cardBackUrl,
+      });
+
+      const { data, error } = await supabase
         .from('customizations')
         .upsert({
           user_id: user?.id,
@@ -120,13 +134,18 @@ export default function Customization() {
           updated_at: new Date().toISOString(),
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       
+      console.log('Save successful:', data);
       setTheme(theme);
       toast.success('Customizations saved!');
     } catch (error) {
       console.error('Error saving customizations:', error);
-      toast.error('Failed to save customizations');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save customizations';
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }

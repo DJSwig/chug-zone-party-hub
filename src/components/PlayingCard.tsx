@@ -1,9 +1,11 @@
 import { Suit } from "@/types/multiplayer";
+import { useCardBack } from "@/hooks/useCardBack";
 
 interface PlayingCardProps {
   suit: Suit;
   size?: "sm" | "md" | "lg";
   className?: string;
+  faceDown?: boolean;
 }
 
 const SUIT_CONFIG = {
@@ -25,8 +27,29 @@ const FONT_SIZES = {
   lg: "text-4xl",
 };
 
-export const PlayingCard = ({ suit, size = "md", className = "" }: PlayingCardProps) => {
+export const PlayingCard = ({ suit, size = "md", className = "", faceDown = false }: PlayingCardProps) => {
   const config = SUIT_CONFIG[suit];
+  const { cardBackUrl } = useCardBack();
+  
+  if (faceDown) {
+    return (
+      <div
+        className={`${SIZE_CLASSES[size]} rounded-lg shadow-lg overflow-hidden ${className}`}
+      >
+        {cardBackUrl ? (
+          <img 
+            src={cardBackUrl} 
+            alt="Card back" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
+            <div className="text-white text-2xl font-bold opacity-50">♠♥♦♣</div>
+          </div>
+        )}
+      </div>
+    );
+  }
   
   return (
     <div
