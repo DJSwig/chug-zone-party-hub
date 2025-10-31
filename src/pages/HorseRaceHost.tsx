@@ -351,41 +351,52 @@ const HorseRaceHost = () => {
                           )}
                         </div>
 
-                        {raceState.current_phase === "betting" && isManual && (
-                          <div className="grid grid-cols-2 gap-1.5 mt-1">
-                            <Select
-                              value={bet?.suit || ""}
-                              onValueChange={(v) => handleSetBet(player.id, player.player_name, v as Suit, bet?.amount || 5)}
-                            >
-                              <SelectTrigger className="h-6 text-[10px]">
-                                <SelectValue placeholder="Suit" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {suits.map((suit) => (
-                                  <SelectItem key={suit} value={suit} className="text-xs">
-                                    {SUIT_NAMES[suit]}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                        {raceState.current_phase === "betting" && (
+                          <>
+                            {isManual ? (
+                              <div className="grid grid-cols-2 gap-1.5 mt-1">
+                                <Select
+                                  value={bet?.suit || ""}
+                                  onValueChange={(v) => handleSetBet(player.id, player.player_name, v as Suit, bet?.amount || 5)}
+                                >
+                                  <SelectTrigger className="h-6 text-[10px]">
+                                    <SelectValue placeholder="Suit" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {suits.map((suit) => (
+                                      <SelectItem key={suit} value={suit} className="text-xs">
+                                        {SUIT_NAMES[suit]}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
 
-                            <Select
-                              value={bet?.amount?.toString() || "5"}
-                              onValueChange={(v) => handleSetBet(player.id, player.player_name, bet?.suit || null, parseInt(v))}
-                              disabled={!bet?.suit}
-                            >
-                              <SelectTrigger className="h-6 text-[10px]">
-                                <SelectValue placeholder="Amount" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {BET_AMOUNTS.map((amount) => (
-                                  <SelectItem key={amount} value={amount.toString()} className="text-xs">
-                                    {amount}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                                <Select
+                                  value={bet?.amount?.toString() || "5"}
+                                  onValueChange={(v) => handleSetBet(player.id, player.player_name, bet?.suit || null, parseInt(v))}
+                                  disabled={!bet?.suit}
+                                >
+                                  <SelectTrigger className="h-6 text-[10px]">
+                                    <SelectValue placeholder="Amount" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {BET_AMOUNTS.map((amount) => (
+                                      <SelectItem key={amount} value={amount.toString()} className="text-xs">
+                                        {amount}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            ) : bet ? (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <PlayingCard suit={bet.suit} size="sm" className="scale-75" />
+                                <span className="text-[10px] text-muted-foreground">× {bet.amount}</span>
+                              </div>
+                            ) : (
+                              <p className="text-[10px] text-muted-foreground mt-1">Waiting for bet...</p>
+                            )}
+                          </>
                         )}
 
                         {bet && raceState.current_phase !== "betting" && (
