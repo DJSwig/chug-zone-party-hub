@@ -127,7 +127,7 @@ export default function Customization() {
       let cardBackUrl = null;
       if (selectedCardBack === 'custom') {
         cardBackUrl = customCardBackUrl;
-      } else {
+      } else if (selectedCardBack !== 'default') {
         // Find the premade card back URL
         const premade = PREMADE_CARD_BACKS.find(cb => cb.id === selectedCardBack);
         if (premade) {
@@ -135,6 +135,8 @@ export default function Customization() {
         }
       }
 
+      console.log('Selected card back:', selectedCardBack);
+      console.log('Resolved card back URL:', cardBackUrl);
       console.log('Saving customizations:', {
         user_id: user?.id,
         theme: theme,

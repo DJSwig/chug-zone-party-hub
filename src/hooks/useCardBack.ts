@@ -23,9 +23,13 @@ export function useCardBack() {
         .eq('user_id', user?.id)
         .single();
 
+      console.log('Fetched card back data:', data);
+
       if (data?.card_back_url && (data.card_back_url.startsWith('/') || /^https?:\/\//i.test(data.card_back_url))) {
+        console.log('Setting card back URL:', data.card_back_url);
         setCardBackUrl(data.card_back_url);
       } else {
+        console.log('No valid card back URL found');
         setCardBackUrl(null);
       }
     } catch (error) {
