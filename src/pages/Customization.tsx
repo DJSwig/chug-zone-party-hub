@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/contexts/ThemeContext';
 import { ParticleBackground } from '@/components/ParticleBackground';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { ArrowLeft, Palette, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Palette, Image as ImageIcon, Upload } from 'lucide-react';
 
 const THEMES = [
   { id: 'classic-neon', name: 'Classic Neon', colors: 'from-neon-purple to-neon-green' },
@@ -15,10 +17,20 @@ const THEMES = [
   { id: 'gold-rush', name: 'Gold Rush', colors: 'from-yellow-400 to-amber-600' },
 ];
 
+const PREMADE_CARD_BACKS = [
+  { id: 'default', name: 'Classic', preview: '/placeholder.svg' },
+  { id: 'neon-grid', name: 'Neon Grid', preview: '/placeholder.svg' },
+  { id: 'purple-swirl', name: 'Purple Swirl', preview: '/placeholder.svg' },
+  { id: 'emerald-diamond', name: 'Emerald Diamond', preview: '/placeholder.svg' },
+];
+
 export default function Customization() {
   const { user, profile, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState('classic-neon');
+  const [selectedCardBack, setSelectedCardBack] = useState<string>('default');
+  const [customCardBackUrl, setCustomCardBackUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -43,25 +55,74 @@ export default function Customization() {
         .single();
 
       if (data) {
-        setSelectedTheme(data.theme || 'classic-neon');
+        setTheme((data.theme as 'classic-neon' | 'purple-haze' | 'emerald-glow' | 'gold-rush') || 'classic-neon');
+        setCustomCardBackUrl(data.card_back_url);
+        if (data.card_back_url) {
+          setSelectedCardBack('custom');
+        }
       }
     } catch (error) {
       console.error('Error fetching customizations:', error);
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('card-backs')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('card-backs')
+        .getPublicUrl(fileName);
+
+      setCustomCardBackUrl(publicUrl);
+      setSelectedCardBack('custom');
+      toast.success('Card back uploaded!');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Failed to upload card back');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const saveCustomizations = async () => {
     setSaving(true);
     try {
+      const cardBackUrl = selectedCardBack === 'custom' ? customCardBackUrl : selectedCardBack;
+
       const { error } = await supabase
         .from('customizations')
         .upsert({
           user_id: user?.id,
-          theme: selectedTheme,
+          theme: theme,
+          card_back_url: cardBackUrl,
           updated_at: new Date().toISOString(),
         });
 
       if (error) throw error;
+      
+      setTheme(theme);
       toast.success('Customizations saved!');
     } catch (error) {
       console.error('Error saving customizations:', error);
@@ -137,19 +198,22 @@ export default function Customization() {
                 <Palette className="w-6 h-6 text-neon-purple" />
                 Select Theme
               </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                This theme will apply across the entire site
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {THEMES.map((theme) => (
+                {THEMES.map((themeOption) => (
                   <button
-                    key={theme.id}
-                    onClick={() => setSelectedTheme(theme.id)}
+                    key={themeOption.id}
+                    onClick={() => setTheme(themeOption.id as any)}
                     className={`p-6 rounded-lg border-2 transition-all ${
-                      selectedTheme === theme.id
+                      theme === themeOption.id
                         ? 'border-primary bg-primary/10'
                         : 'border-primary/20 hover:border-primary/40'
                     }`}
                   >
-                    <div className={`h-20 rounded-lg bg-gradient-to-r ${theme.colors} mb-3`} />
-                    <p className="font-medium">{theme.name}</p>
+                    <div className={`h-20 rounded-lg bg-gradient-to-r ${themeOption.colors} mb-3`} />
+                    <p className="font-medium">{themeOption.name}</p>
                   </button>
                 ))}
               </div>
@@ -160,9 +224,79 @@ export default function Customization() {
                 <ImageIcon className="w-6 h-6 text-neon-green" />
                 Card Backs
               </h2>
-              <p className="text-muted-foreground mb-4">
-                Custom card back uploads coming soon...
-              </p>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">Pre-made Designs</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {PREMADE_CARD_BACKS.map((cardBack) => (
+                      <button
+                        key={cardBack.id}
+                        onClick={() => setSelectedCardBack(cardBack.id)}
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          selectedCardBack === cardBack.id
+                            ? 'border-primary bg-primary/10'
+                            : 'border-primary/20 hover:border-primary/40'
+                        }`}
+                      >
+                        <div className="aspect-[2/3] bg-background/50 rounded mb-2 flex items-center justify-center">
+                          <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm font-medium">{cardBack.name}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-3">Custom Upload</h3>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                        className="hidden"
+                        id="card-back-upload"
+                      />
+                      <label htmlFor="card-back-upload">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={uploading}
+                          onClick={() => document.getElementById('card-back-upload')?.click()}
+                          asChild
+                        >
+                          <span>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {uploading ? 'Uploading...' : 'Upload Image'}
+                          </span>
+                        </Button>
+                      </label>
+                      {customCardBackUrl && (
+                        <button
+                          onClick={() => setSelectedCardBack('custom')}
+                          className={`p-3 rounded-lg border-2 transition-all ${
+                            selectedCardBack === 'custom'
+                              ? 'border-primary bg-primary/10'
+                              : 'border-primary/20 hover:border-primary/40'
+                          }`}
+                        >
+                          <img
+                            src={customCardBackUrl}
+                            alt="Custom card back"
+                            className="w-12 h-18 object-cover rounded"
+                          />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Upload a custom image for your card backs (max 5MB)
+                    </p>
+                  </div>
+                </div>
+              </div>
             </Card>
 
             <Button
