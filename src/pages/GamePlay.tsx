@@ -132,8 +132,8 @@ export default function GamePlay() {
     <PageTransition>
       <div className="min-h-screen bg-background flex overflow-y-auto">
       {/* Left Sidebar - Player List */}
-      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0">
-        <div className="p-4 border-b border-border flex-shrink-0">
+      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-glow-cyan/20">
+        <div className="p-4 border-b border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
           <Button
             variant="ghost"
             size="sm"
@@ -145,7 +145,7 @@ export default function GamePlay() {
           </Button>
         </div>
         
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 p-4 flex flex-col min-h-0">
           <PlayerManager
             players={players}
             currentPlayerIndex={currentPlayerIndex}

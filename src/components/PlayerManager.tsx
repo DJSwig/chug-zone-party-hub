@@ -59,7 +59,7 @@ export const PlayerManager = ({
 
   return (
     <Card className="p-6 bg-gradient-card border-border h-full flex flex-col">
-      <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between">
+      <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between flex-shrink-0">
         Players
         <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
       </h2>
@@ -73,51 +73,53 @@ export const PlayerManager = ({
         </div>
       )}
 
-      {/* Player Grid - Expands Vertically First */}
-      <div className={`mb-4 flex-1 overflow-y-auto custom-scrollbar ${
-        players.length > 12 ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-2'
-      }`}>
-        {players.map((player, index) => (
-          <div
-            key={player.id}
-            className={`flex items-center gap-2 p-3 rounded-lg border transition-all relative group ${
-              index === currentPlayerIndex
-                ? "border-primary bg-primary/10 shadow-glow-cyan"
-                : "border-border bg-muted/30 hover:border-primary/30"
-            }`}
-          >
-            <GripVertical className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <Input
-                value={player.name}
-                onChange={(e) => handleNameChange(player.id, e.target.value)}
-                className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-1 w-full"
-                style={{ 
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}
-                title={player.name}
-              />
-            </div>
-            {player.name.length > 12 && (
-              <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-glow-cyan z-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
-                {player.name}
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleRemovePlayer(player.id)}
-              className="flex-shrink-0 text-muted-foreground hover:text-destructive h-7 w-7"
+      {/* Player Grid - No Scrolling, Expands Vertically Then Horizontally */}
+      {players.length > 0 && (
+        <div className={`mb-4 flex-1 transition-all duration-300 ${
+          players.length > 10 ? 'grid grid-cols-2 gap-x-3 gap-y-2 auto-rows-min content-start' : 'flex flex-col gap-2'
+        }`}>
+          {players.map((player, index) => (
+            <div
+              key={player.id}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all relative group ${
+                index === currentPlayerIndex
+                  ? "border-primary bg-primary/10 shadow-glow-cyan"
+                  : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-glow-cyan/30"
+              }`}
             >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        ))}
-      </div>
+              <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <Input
+                  value={player.name}
+                  onChange={(e) => handleNameChange(player.id, e.target.value)}
+                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full"
+                  style={{ 
+                    whiteSpace: 'nowrap',
+                    overflow: 'visible',
+                    textOverflow: 'clip'
+                  }}
+                  title={player.name}
+                />
+              </div>
+              {player.name.length > 15 && (
+                <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-glow-cyan z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                  {player.name}
+                </div>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleRemovePlayer(player.id)}
+                className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6"
+              >
+                <X className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-shrink-0">
         <Input
           value={newPlayerName}
           onChange={(e) => setNewPlayerName(e.target.value)}
