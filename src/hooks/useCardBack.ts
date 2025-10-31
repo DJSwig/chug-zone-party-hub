@@ -23,8 +23,10 @@ export function useCardBack() {
         .eq('user_id', user?.id)
         .single();
 
-      if (data?.card_back_url) {
+      if (data?.card_back_url && /^https?:\/\//i.test(data.card_back_url)) {
         setCardBackUrl(data.card_back_url);
+      } else {
+        setCardBackUrl(null);
       }
     } catch (error) {
       console.error('Error fetching card back:', error);

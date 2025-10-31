@@ -9,10 +9,10 @@ interface PlayingCardProps {
 }
 
 const SUIT_CONFIG = {
-  spades: { symbol: "♠", color: "text-gray-900", name: "A" },
-  hearts: { symbol: "♥", color: "text-red-600", name: "A" },
-  diamonds: { symbol: "♦", color: "text-red-600", name: "A" },
-  clubs: { symbol: "♣", color: "text-gray-900", name: "A" },
+  spades: { symbol: "♠", color: "text-foreground", name: "A" },
+  hearts: { symbol: "♥", color: "text-primary", name: "A" },
+  diamonds: { symbol: "♦", color: "text-primary", name: "A" },
+  clubs: { symbol: "♣", color: "text-foreground", name: "A" },
 };
 
 const SIZE_CLASSES = {
@@ -44,7 +44,7 @@ export const PlayingCard = ({ suit, size = "md", className = "", faceDown = fals
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
-            <div className="text-white text-2xl font-bold opacity-50">♠♥♦♣</div>
+            <div className="text-foreground text-2xl font-bold opacity-70">♠♥♦♣</div>
           </div>
         )}
       </div>
@@ -53,7 +53,7 @@ export const PlayingCard = ({ suit, size = "md", className = "", faceDown = fals
   
   return (
     <div
-      className={`${SIZE_CLASSES[size]} bg-white rounded-lg shadow-lg flex flex-col items-center justify-center gap-1 p-2 ${className}`}
+      className={`${SIZE_CLASSES[size]} bg-card rounded-lg shadow-lg flex flex-col items-center justify-center gap-1 p-2 ${className}`}
     >
       <div className={`${FONT_SIZES[size]} font-bold ${config.color} leading-none`}>
         {config.name}

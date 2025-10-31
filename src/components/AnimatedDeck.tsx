@@ -50,7 +50,7 @@ export const AnimatedDeck = ({ drawnCards, isRacing }: AnimatedDeckProps) => {
             <img src={cardBackUrl} alt="Card back" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center">
-              <div className="text-white text-xs font-bold text-center z-10">
+              <div className="text-foreground text-xs font-bold text-center z-10">
                 CHUG<br/>ZONE
               </div>
             </div>

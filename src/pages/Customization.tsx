@@ -117,7 +117,7 @@ export default function Customization() {
   const saveCustomizations = async () => {
     setSaving(true);
     try {
-      const cardBackUrl = selectedCardBack === 'custom' ? customCardBackUrl : selectedCardBack;
+      const cardBackUrl = selectedCardBack === 'custom' ? customCardBackUrl : null;
 
       console.log('Saving customizations:', {
         user_id: user?.id,
@@ -127,12 +127,17 @@ export default function Customization() {
 
       const { data, error } = await supabase
         .from('customizations')
-        .upsert({
-          user_id: user?.id,
-          theme: theme,
-          card_back_url: cardBackUrl,
-          updated_at: new Date().toISOString(),
-        });
+        .upsert(
+          {
+            user_id: user?.id!,
+            theme: theme,
+            card_back_url: cardBackUrl,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        )
+        .select()
+        .single();
 
       if (error) {
         console.error('Supabase error:', error);

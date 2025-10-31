@@ -34,6 +34,11 @@ const themeColors = {
     border: '280 100% 70%',
     muted: '0 0% 15%',
     'muted-foreground': '0 0% 70%',
+    // Added to ensure full theming coverage
+    popover: '0 0% 5%',
+    'popover-foreground': '0 0% 100%',
+    input: '0 0% 15%',
+    ring: '280 100% 70%',
   },
   'purple-haze': {
     primary: '270 80% 60%',
@@ -52,6 +57,11 @@ const themeColors = {
     border: '270 80% 60%',
     muted: '270 30% 20%',
     'muted-foreground': '270 20% 70%',
+    // Added to ensure full theming coverage
+    popover: '270 40% 10%',
+    'popover-foreground': '270 20% 95%',
+    input: '270 30% 20%',
+    ring: '270 80% 60%',
   },
   'emerald-glow': {
     primary: '150 80% 50%',
@@ -70,6 +80,11 @@ const themeColors = {
     border: '150 80% 50%',
     muted: '150 30% 15%',
     'muted-foreground': '150 20% 70%',
+    // Added to ensure full theming coverage
+    popover: '150 40% 8%',
+    'popover-foreground': '150 20% 95%',
+    input: '150 30% 15%',
+    ring: '150 80% 50%',
   },
   'gold-rush': {
     primary: '45 100% 50%',
@@ -88,6 +103,11 @@ const themeColors = {
     border: '45 100% 50%',
     muted: '40 30% 20%',
     'muted-foreground': '45 20% 70%',
+    // Added to ensure full theming coverage
+    popover: '40 50% 12%',
+    'popover-foreground': '45 30% 95%',
+    input: '40 30% 20%',
+    ring: '45 100% 50%',
   },
 };
 
