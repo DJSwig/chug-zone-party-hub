@@ -65,30 +65,33 @@ serve(async (req) => {
     const guilds = await guildsResponse.json();
     const isServerMember = guilds.some((guild: any) => guild.id === CHUGZONE_SERVER_ID);
 
-    // Create or get Supabase user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: `${discordUser.id}@discord.temp`,
-      email_confirm: true,
-      user_metadata: {
-        discord_id: discordUser.id,
-        discord_username: discordUser.username,
-        discord_avatar: discordUser.avatar,
-      },
-    });
+    // Check if user already exists
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('discord_id', discordUser.id)
+      .maybeSingle();
 
-    if (authError && !authError.message.includes('already exists')) {
-      throw authError;
-    }
+    let userId = existingProfile?.id;
 
-    // Get the user ID (either from creation or existing user)
-    let userId = authData?.user?.id;
+    // Create user if doesn't exist
     if (!userId) {
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('discord_id', discordUser.id)
-        .single();
-      userId = existingUser?.id;
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: `${discordUser.id}@discord.temp`,
+        email_confirm: true,
+        user_metadata: {
+          discord_id: discordUser.id,
+          discord_username: discordUser.username,
+          discord_avatar: discordUser.avatar,
+        },
+      });
+
+      if (authError) {
+        console.error('Create user error:', authError);
+        throw authError;
+      }
+
+      userId = authData.user.id;
     }
 
     // Update or create profile
@@ -124,19 +127,30 @@ serve(async (req) => {
       }
     }
 
-    // Generate session token
-    const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
+    // Generate a magic link and extract the token
+    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: 'magiclink',
       email: `${discordUser.id}@discord.temp`,
     });
 
-    if (sessionError) {
-      throw sessionError;
+    if (linkError) {
+      console.error('Generate link error:', linkError);
+      throw linkError;
     }
+
+    // Extract token from the action_link
+    const actionLink = linkData.properties.action_link;
+    const url = new URL(actionLink);
+    const token = url.searchParams.get('token');
+    const tokenHash = linkData.properties.hashed_token;
+
+    console.log('Generated auth link successfully');
 
     return new Response(
       JSON.stringify({
-        session: sessionData,
+        token,
+        token_hash: tokenHash,
+        type: 'magiclink',
         user: discordUser,
         isServerMember,
         isAdmin: discordUser.id === OWNER_DISCORD_ID,

@@ -28,23 +28,35 @@ export default function Auth() {
         body: { code },
       });
 
-      if (error) throw error;
-
-      // Sign in with the session token
-      if (data.session?.properties?.access_token) {
-        const { error: signInError } = await supabase.auth.setSession({
-          access_token: data.session.properties.access_token,
-          refresh_token: data.session.properties.refresh_token,
-        });
-
-        if (signInError) throw signInError;
-
-        toast.success(`Welcome back, ${data.user.username}!`);
-        navigate('/');
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
       }
+
+      if (!data.token) {
+        throw new Error('No token received from Discord authentication');
+      }
+
+      console.log('Received auth data, verifying OTP...');
+
+      // Use verifyOtp with the token and type from the magic link
+      const { data: sessionData, error: verifyError } = await supabase.auth.verifyOtp({
+        token_hash: data.token_hash,
+        type: 'magiclink',
+      });
+
+      if (verifyError) {
+        console.error('Verify OTP error:', verifyError);
+        throw verifyError;
+      }
+
+      console.log('Successfully authenticated!');
+      toast.success(`Welcome, ${data.user.username}!`);
+      navigate('/');
     } catch (error) {
       console.error('Discord auth error:', error);
-      toast.error('Failed to authenticate with Discord');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to authenticate with Discord';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
