@@ -106,7 +106,7 @@ export default function GameSettings() {
           </div>
 
           {loadedKeyName && (
-            <div className="mb-6 p-4 rounded-lg bg-primary/10 border-2 border-primary text-center shadow-glow-cyan">
+            <div className="mb-6 p-4 rounded-lg bg-primary/10 border-2 border-primary text-center shadow-[0_0_30px_hsl(var(--primary)/0.5)]">
               <p className="text-sm text-foreground">
                 Currently loaded: <span className="font-bold text-primary text-lg">{loadedKeyName}</span>
               </p>
@@ -123,8 +123,8 @@ export default function GameSettings() {
                   onClick={() => handlePresetChange(index)}
                   className={`p-4 rounded-lg border-2 transition-all text-left hover:scale-105 ${
                     selectedPreset === index
-                      ? "border-primary bg-primary/10 shadow-glow-cyan"
-                      : "border-border hover:border-primary/50 bg-card hover:shadow-glow-cyan"
+                      ? "border-primary bg-primary/10 shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
+                      : "border-border hover:border-primary/50 bg-card hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
                   }`}
                 >
                   <h3 className="text-lg font-bold mb-1 text-foreground">{preset.name}</h3>

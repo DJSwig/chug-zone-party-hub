@@ -58,7 +58,7 @@ export const HeroSection = () => {
             <Button
               onClick={scrollToGames}
               size="lg"
-              className="group relative bg-gradient-to-r from-primary via-secondary to-accent text-primary-foreground font-bold text-xl px-10 py-7 hover:scale-110 transition-all duration-300 shadow-glow-cyan overflow-hidden"
+              className="group relative bg-gradient-to-r from-primary via-secondary to-accent text-primary-foreground font-bold text-xl px-10 py-7 hover:scale-110 transition-all duration-300 shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_40px_hsl(var(--primary)/0.7)] overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
               <Play className="mr-2 h-6 w-6 relative z-10" />

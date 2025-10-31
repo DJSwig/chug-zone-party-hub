@@ -140,7 +140,7 @@ export default function GamePlay() {
     <PageTransition>
       <div className="min-h-screen bg-background flex overflow-y-auto">
       {/* Left Sidebar - Player List */}
-      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-glow-cyan/20 transition-all duration-300">
+      <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-[0_0_20px_hsl(var(--primary)/0.2)] transition-all duration-300">
         <div className="p-4 border-b border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
           <Button
             variant="ghost"
@@ -181,7 +181,7 @@ export default function GamePlay() {
       <div className="flex-1 flex flex-col">
         {/* Top Bar - Next Turn */}
         <div className="flex items-center justify-center py-4 border-b border-border bg-card/50 sticky top-0 z-10">
-          <Card className="px-8 py-3 bg-gradient-card border-primary shadow-glow-cyan">
+          <Card className="px-8 py-3 bg-card border-primary shadow-[0_0_30px_hsl(var(--primary)/0.5)]">
             <div className="flex items-center gap-3">
               <span className="text-sm text-muted-foreground">Next Turn:</span>
               <span className="text-3xl font-bold text-primary animate-glow-pulse">
@@ -209,7 +209,7 @@ export default function GamePlay() {
                     isDrawn
                       ? "opacity-0 pointer-events-none"
                       : isFlipping
-                      ? "animate-card-flip scale-125 shadow-glow-cyan z-20"
+                      ? "animate-card-flip scale-125 shadow-[0_0_40px_hsl(var(--primary)/0.7)] z-20"
                       : "opacity-100"
                   }`}
                   style={{
@@ -251,7 +251,7 @@ export default function GamePlay() {
                 height: '200px',
               }}
             >
-              <Card className="w-full h-full bg-gradient-card border-primary shadow-glow-cyan flex items-center justify-center">
+              <Card className="w-full h-full bg-card border-primary shadow-[0_0_30px_hsl(var(--primary)/0.5)] flex items-center justify-center">
                 {currentCard ? (
                   <div className="text-center animate-scale-in px-3">
                     <div className="text-6xl font-bold mb-2 text-primary animate-glow-pulse">
@@ -294,7 +294,7 @@ export default function GamePlay() {
               <Button
                 onClick={handleDrawCard}
                 disabled={drawnCards.size >= 52 || players.length === 0}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-6 py-5 shadow-glow-cyan hover:shadow-glow-purple hover:scale-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed animate-button-pulse"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-6 py-5 shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_40px_hsl(var(--primary)/0.7)] hover:scale-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed animate-button-pulse"
               >
                 <Shuffle className="w-4 h-4 mr-2" />
                 Draw Card

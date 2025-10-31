@@ -39,7 +39,7 @@ export const HostPanel = ({
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
         {/* Mates Section */}
-        <Card className="p-4 bg-gradient-card border-border">
+        <Card className="p-4 bg-card border-border shadow-[0_0_20px_hsl(var(--primary)/0.2)]">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl font-bold text-foreground">Mates</h3>
             <Button
@@ -92,7 +92,7 @@ export const HostPanel = ({
         </Card>
 
         {/* Notes Section */}
-        <Card className="p-4 bg-gradient-card border-border">
+        <Card className="p-4 bg-card border-border shadow-[0_0_20px_hsl(var(--primary)/0.2)]">
           <h3 className="text-xl font-bold text-foreground mb-3">Notes</h3>
           <Textarea
             value={notes}
