@@ -145,24 +145,6 @@ const HorseRaceHost = () => {
       .eq("session_id", sessionId);
   };
 
-  const handleLockBet = async (playerId: string) => {
-    if (!sessionId || !raceState) return;
-
-    const bets = raceState.bets as HorseRaceBet[];
-    const bet = bets.find(b => b.player_id === playerId);
-    if (!bet) return;
-
-    const newBets = [
-      ...bets.filter(b => b.player_id !== playerId),
-      { ...bet, locked: true },
-    ];
-
-    await supabase
-      .from("horse_race_state")
-      .update({ bets: newBets as any })
-      .eq("session_id", sessionId);
-  };
-
   const startRace = async () => {
     if (!sessionId || !raceState) return;
 
@@ -369,52 +351,41 @@ const HorseRaceHost = () => {
                           )}
                         </div>
 
-                        {raceState.current_phase === "betting" && (
-                          <>
-                            <div className="grid grid-cols-2 gap-1.5 mt-1">
-                              <Select
-                                value={bet?.suit || ""}
-                                onValueChange={(v) => handleSetBet(player.id, player.player_name, v as Suit, bet?.amount || 5)}
-                              >
-                                <SelectTrigger className="h-6 text-[10px]">
-                                  <SelectValue placeholder="Suit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {suits.map((suit) => (
-                                    <SelectItem key={suit} value={suit} className="text-xs">
-                                      {SUIT_NAMES[suit]}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                        {raceState.current_phase === "betting" && isManual && (
+                          <div className="grid grid-cols-2 gap-1.5 mt-1">
+                            <Select
+                              value={bet?.suit || ""}
+                              onValueChange={(v) => handleSetBet(player.id, player.player_name, v as Suit, bet?.amount || 5)}
+                            >
+                              <SelectTrigger className="h-6 text-[10px]">
+                                <SelectValue placeholder="Suit" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {suits.map((suit) => (
+                                  <SelectItem key={suit} value={suit} className="text-xs">
+                                    {SUIT_NAMES[suit]}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
 
-                              <Select
-                                value={bet?.amount?.toString() || "5"}
-                                onValueChange={(v) => handleSetBet(player.id, player.player_name, bet?.suit || null, parseInt(v))}
-                                disabled={!bet?.suit}
-                              >
-                                <SelectTrigger className="h-6 text-[10px]">
-                                  <SelectValue placeholder="Amount" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {BET_AMOUNTS.map((amount) => (
-                                    <SelectItem key={amount} value={amount.toString()} className="text-xs">
-                                      {amount}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {bet && !bet.locked && (
-                              <Button
-                                onClick={() => handleLockBet(player.id)}
-                                size="sm"
-                                className="w-full mt-1.5 h-6 text-[10px] bg-primary hover:bg-primary/90"
-                              >
-                                Lock Bet
-                              </Button>
-                            )}
-                          </>
+                            <Select
+                              value={bet?.amount?.toString() || "5"}
+                              onValueChange={(v) => handleSetBet(player.id, player.player_name, bet?.suit || null, parseInt(v))}
+                              disabled={!bet?.suit}
+                            >
+                              <SelectTrigger className="h-6 text-[10px]">
+                                <SelectValue placeholder="Amount" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {BET_AMOUNTS.map((amount) => (
+                                  <SelectItem key={amount} value={amount.toString()} className="text-xs">
+                                    {amount}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         )}
 
                         {bet && raceState.current_phase !== "betting" && (

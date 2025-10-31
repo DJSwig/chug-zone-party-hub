@@ -61,7 +61,7 @@ const HorseRacePlayer = () => {
         if (existingBet) {
           setSelectedSuit(existingBet.suit);
           setSelectedAmount(existingBet.amount);
-          setBetLocked(true);
+          setBetLocked(existingBet.locked || false);
         }
       }
     };
@@ -84,8 +84,15 @@ const HorseRacePlayer = () => {
             const newState = payload.new as unknown as HorseRaceState;
             setRaceState(newState);
             
-            // Reset bet lock if race restarts
-            if (newState.current_phase === "betting") {
+            // Update bet lock status from server
+            const bets = newState.bets as any[];
+            const myBet = bets.find(b => b.player_id === playerId);
+            if (myBet) {
+              setSelectedSuit(myBet.suit);
+              setSelectedAmount(myBet.amount);
+              setBetLocked(myBet.locked || false);
+            } else if (newState.current_phase === "betting") {
+              // Reset if no bet and in betting phase
               setBetLocked(false);
               setSelectedSuit("");
               setSelectedAmount(5);
@@ -114,6 +121,7 @@ const HorseRacePlayer = () => {
         player_name: playerName,
         suit: selectedSuit,
         amount: selectedAmount,
+        locked: true,
       },
     ];
 
@@ -128,7 +136,31 @@ const HorseRacePlayer = () => {
     }
 
     setBetLocked(true);
-    toast.success("Bet placed!");
+    toast.success("Bet locked in!");
+  };
+
+  const updateBet = async (suit: Suit | "", amount: number) => {
+    if (!sessionId || !playerId || !raceState || !betLocked) return;
+
+    // Unlock the bet when they change it
+    const bets = raceState.bets as any[];
+    const newBets = [
+      ...bets.filter(b => b.player_id !== playerId),
+      {
+        player_id: playerId,
+        player_name: playerName,
+        suit: suit || selectedSuit,
+        amount,
+        locked: false,
+      },
+    ];
+
+    await supabase
+      .from("horse_race_state")
+      .update({ bets: newBets as any })
+      .eq("session_id", sessionId);
+
+    setBetLocked(false);
   };
 
   if (!raceState) {
@@ -168,13 +200,17 @@ const HorseRacePlayer = () => {
                     {suits.map((suit) => (
                       <button
                         key={suit}
-                        onClick={() => !betLocked && setSelectedSuit(suit)}
-                        disabled={betLocked}
-                        className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center ${
+                        onClick={() => {
+                          if (betLocked) {
+                            updateBet(suit, selectedAmount);
+                          }
+                          setSelectedSuit(suit);
+                        }}
+                        className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center cursor-pointer ${
                           selectedSuit === suit
                             ? "border-primary bg-primary/10 shadow-glow-emerald"
                             : "border-border bg-muted/30 hover:border-primary/50"
-                        } ${betLocked ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                        }`}
                       >
                         <PlayingCard suit={suit} size="md" className="mb-2" />
                         <div className="font-semibold">{SUIT_NAMES[suit]}</div>
@@ -190,8 +226,13 @@ const HorseRacePlayer = () => {
                   <label className="text-sm font-medium mb-2 block">Bet Amount (drinks)</label>
                   <Select
                     value={selectedAmount.toString()}
-                    onValueChange={(v) => !betLocked && setSelectedAmount(parseInt(v))}
-                    disabled={betLocked}
+                    onValueChange={(v) => {
+                      const newAmount = parseInt(v);
+                      if (betLocked) {
+                        updateBet(selectedSuit, newAmount);
+                      }
+                      setSelectedAmount(newAmount);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
