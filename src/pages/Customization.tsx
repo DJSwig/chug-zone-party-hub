@@ -23,6 +23,7 @@ const PREMADE_CARD_BACKS = [
   { id: 'purple-swirl', name: 'Purple Swirl', preview: '/card-backs/purple-swirl.png' },
   { id: 'emerald-diamond', name: 'Emerald Diamond', preview: '/card-backs/emerald-diamond.png' },
   { id: 'slime', name: 'Slime', preview: '/card-backs/slime.png' },
+  { id: 'halloween', name: 'Halloween', preview: '/card-backs/halloween.png' },
 ];
 
 export default function Customization() {
