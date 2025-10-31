@@ -10,14 +10,18 @@ interface PlayerManagerProps {
   players: Player[];
   currentPlayerIndex: number;
   onPlayersChange: (players: Player[]) => void;
+  onCurrentPlayerIndexChange?: (newIndex: number) => void;
 }
 
 export const PlayerManager = ({
   players,
   currentPlayerIndex,
   onPlayersChange,
+  onCurrentPlayerIndexChange,
 }: PlayerManagerProps) => {
   const [newPlayerName, setNewPlayerName] = useState("");
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [draggedOverIndex, setDraggedOverIndex] = useState<number | null>(null);
 
   const handleAddPlayer = () => {
     if (!newPlayerName.trim()) {
@@ -57,6 +61,48 @@ export const PlayerManager = ({
     );
   };
 
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDraggedOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDraggedOverIndex(null);
+      return;
+    }
+
+    const newPlayers = [...players];
+    const [draggedPlayer] = newPlayers.splice(draggedIndex, 1);
+    newPlayers.splice(dropIndex, 0, draggedPlayer);
+
+    // Calculate new current player index
+    // The current player should remain the same person, just at a different index
+    const currentPlayerId = players[currentPlayerIndex]?.id;
+    const newCurrentPlayerIndex = newPlayers.findIndex(p => p.id === currentPlayerId);
+
+    onPlayersChange(newPlayers);
+    if (onCurrentPlayerIndexChange && newCurrentPlayerIndex !== -1) {
+      onCurrentPlayerIndexChange(newCurrentPlayerIndex);
+    }
+
+    setDraggedIndex(null);
+    setDraggedOverIndex(null);
+    toast.success("Player order updated");
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDraggedOverIndex(null);
+  };
+
   return (
     <Card className="p-5 bg-gradient-card border-border h-full flex flex-col transition-all duration-300">
       <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between flex-shrink-0">
@@ -83,13 +129,24 @@ export const PlayerManager = ({
           {players.map((player, index) => (
             <div
               key={player.id}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all duration-200 relative group ${
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
                 index === currentPlayerIndex
                   ? "border-primary bg-primary/10 shadow-glow-cyan"
                   : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-glow-cyan/30"
+              } ${
+                draggedIndex === index ? "opacity-50" : ""
+              } ${
+                draggedOverIndex === index && draggedIndex !== null && draggedIndex !== index
+                  ? "border-primary/60 scale-105"
+                  : ""
               }`}
             >
-              <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 cursor-grab active:cursor-grabbing" />
               <div className="flex-1 min-w-0 overflow-hidden">
                 <Input
                   value={player.name}

@@ -164,6 +164,7 @@ export default function GamePlay() {
               }
               setPlayers(newPlayers);
             }}
+            onCurrentPlayerIndexChange={setCurrentPlayerIndex}
           />
         </div>
       </div>
