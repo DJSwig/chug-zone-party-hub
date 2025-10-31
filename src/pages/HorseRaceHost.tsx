@@ -13,7 +13,7 @@ import { AnimatedDeck } from "@/components/AnimatedDeck";
 import { PlayingCard } from "@/components/PlayingCard";
 import { useGameSession } from "@/hooks/useGameSession";
 import { HorseRaceBet, HorseRaceState, Suit, SessionPlayer } from "@/types/multiplayer";
-import { ArrowLeft, Play, RotateCcw, Trophy, Plus, X } from "lucide-react";
+import { ArrowLeft, Play, RotateCcw, Trophy, Plus, X, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SUIT_NAMES = {
@@ -332,6 +332,7 @@ const HorseRaceHost = () => {
                           <div className="font-medium text-xs flex items-center gap-1.5">
                             {player.player_name}
                             {isManual && <span className="text-[10px] text-primary">(host)</span>}
+                            {bet && <Check className="w-3 h-3 text-green-500" />}
                           </div>
                           {raceState.current_phase === "betting" && (
                             <Button
