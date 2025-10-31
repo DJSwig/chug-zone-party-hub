@@ -7,7 +7,7 @@ export const LoadingAnimation = () => {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-12 h-16 bg-gradient-primary rounded-b-lg animate-shot-bounce shadow-glow-cyan"
+              className="w-12 h-16 bg-gradient-to-br from-primary via-secondary to-accent rounded-b-lg animate-shot-bounce shadow-[0_0_30px_hsl(var(--primary)/0.5)]"
               style={{
                 animationDelay: `${i * 0.15}s`,
               }}
@@ -17,7 +17,7 @@ export const LoadingAnimation = () => {
         
         {/* ChugZone text */}
         <div className="text-center">
-          <h2 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent animate-glow-pulse">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-glow-pulse">
             ChugZone
           </h2>
           <div className="flex justify-center gap-1 mt-3">

@@ -21,7 +21,7 @@ export const GameCard = ({ game }: GameCardProps) => {
   return (
     <div 
       onClick={handleClick}
-      className="group relative overflow-hidden rounded-xl bg-gradient-card border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-glow-emerald hover:scale-[1.02] cursor-pointer h-full"
+      className="group relative overflow-hidden rounded-xl bg-gradient-card border-2 border-border hover:border-primary transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-[1.02] cursor-pointer h-full"
     >
       {/* Glow Effect on Hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:to-transparent transition-all duration-500" />
@@ -55,7 +55,7 @@ export const GameCard = ({ game }: GameCardProps) => {
         
         {/* Play Button */}
         <Button
-          className="w-full bg-gradient-primary hover:opacity-90 text-primary-foreground font-bold py-3 shadow-glow-emerald transition-all duration-300 group-hover:scale-105"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_40px_hsl(var(--primary)/0.7)] transition-all duration-300 group-hover:scale-105"
         >
           Play Now
         </Button>

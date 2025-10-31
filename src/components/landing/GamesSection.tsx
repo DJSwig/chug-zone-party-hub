@@ -8,7 +8,7 @@ export const GamesSection = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-20">
           <h2 className="text-5xl md:text-6xl font-black mb-6">
-            <span className="bg-gradient-neon bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               Choose Your Game
             </span>
           </h2>
@@ -17,9 +17,9 @@ export const GamesSection = () => {
           </p>
           
           {/* Coming soon badge */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-hero/10 border-2 border-[hsl(var(--neon-purple))]/30 animate-pulse">
-            <Sparkles className="h-5 w-5 text-[hsl(var(--neon-purple))]" />
-            <span className="text-sm font-bold text-[hsl(var(--neon-purple))] uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border-2 border-primary/30 animate-pulse">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <span className="text-sm font-bold text-primary uppercase tracking-wider">
               More Games Coming Soon!
             </span>
           </div>

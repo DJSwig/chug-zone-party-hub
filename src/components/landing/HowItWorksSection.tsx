@@ -30,7 +30,7 @@ export const HowItWorksSection = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-20">
           <h2 className="text-5xl md:text-6xl font-black mb-6">
-            <span className="bg-gradient-neon bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               How It Works
             </span>
           </h2>
