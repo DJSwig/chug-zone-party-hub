@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Beer, Sparkles, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { UserMenu } from "@/components/UserMenu";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ export const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* User menu in top right */}
+      <div className="absolute top-6 right-6 z-20">
+        <UserMenu />
+      </div>
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[hsl(var(--neon-purple))] rounded-full blur-[120px] opacity-20 animate-pulse" />
