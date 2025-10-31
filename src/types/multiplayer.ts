@@ -21,6 +21,7 @@ export interface HorseRaceBet {
   player_name: string;
   suit: 'spades' | 'hearts' | 'diamonds' | 'clubs';
   amount: number;
+  locked?: boolean;
 }
 
 export interface HorseRaceState {
