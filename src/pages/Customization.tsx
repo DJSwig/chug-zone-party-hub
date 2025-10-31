@@ -18,10 +18,11 @@ const THEMES = [
 ];
 
 const PREMADE_CARD_BACKS = [
-  { id: 'default', name: 'Classic', preview: '/placeholder.svg' },
-  { id: 'neon-grid', name: 'Neon Grid', preview: '/placeholder.svg' },
-  { id: 'purple-swirl', name: 'Purple Swirl', preview: '/placeholder.svg' },
-  { id: 'emerald-diamond', name: 'Emerald Diamond', preview: '/placeholder.svg' },
+  { id: 'default', name: 'Classic', preview: '/card-backs/default.png' },
+  { id: 'neon-grid', name: 'Neon Grid', preview: '/card-backs/neon-grid.png' },
+  { id: 'purple-swirl', name: 'Purple Swirl', preview: '/card-backs/purple-swirl.png' },
+  { id: 'emerald-diamond', name: 'Emerald Diamond', preview: '/card-backs/emerald-diamond.png' },
+  { id: 'slime', name: 'Slime', preview: '/card-backs/slime.png' },
 ];
 
 export default function Customization() {
@@ -252,7 +253,7 @@ export default function Customization() {
               <div className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-3">Pre-made Designs</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {PREMADE_CARD_BACKS.map((cardBack) => (
                       <button
                         key={cardBack.id}
@@ -263,8 +264,12 @@ export default function Customization() {
                             : 'border-primary/20 hover:border-primary/40'
                         }`}
                       >
-                        <div className="aspect-[2/3] bg-background/50 rounded mb-2 flex items-center justify-center">
-                          <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                        <div className="aspect-[2/3] bg-background/50 rounded mb-2 overflow-hidden">
+                          <img 
+                            src={cardBack.preview} 
+                            alt={cardBack.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <p className="text-sm font-medium">{cardBack.name}</p>
                       </button>
