@@ -1,19 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, RotateCcw, UserPlus, X } from "lucide-react";
+import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Player } from "@/types/game";
 import { PageTransition } from "@/components/PageTransition";
 import { RideBusCard } from "@/components/RideBusCard";
 import { useCardBack } from "@/hooks/useCardBack";
 import { toast } from "sonner";
-import { BusRiderAnnouncement } from "@/components/ride-bus/BusRiderAnnouncement";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const SUITS = ["hearts", "clubs", "diamonds", "spades"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -61,7 +64,10 @@ export default function RideBusPlay() {
   const [busRider, setBusRider] = useState<ExtendedPlayer | null>(null);
   const [deckCount, setDeckCount] = useState(52);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [isAddPlayerOpen, setIsAddPlayerOpen] = useState(false);
+  const [giveCardModalOpen, setGiveCardModalOpen] = useState(false);
+  const [currentMatchingPlayer, setCurrentMatchingPlayer] = useState<string | null>(null);
+  const [currentMatchingCard, setCurrentMatchingCard] = useState<string | null>(null);
+  const giveCardTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize a shuffled deck
   const initializeDeck = (): string[] => {
@@ -101,7 +107,6 @@ export default function RideBusPlay() {
 
   const handleAddPlayer = () => {
     if (!newPlayerName.trim()) {
-      toast.error("Please enter a player name");
       return;
     }
     if (players.length >= 8) {
@@ -116,9 +121,31 @@ export default function RideBusPlay() {
     };
 
     setPlayers([...players, newPlayer]);
+    
+    // If game is active, catch up the player
+    if (currentPhase !== "round1" || playerCards.length > 0) {
+      const cardsNeeded = currentRound;
+      const catchUpCards: string[] = [];
+      
+      for (let i = 0; i < cardsNeeded; i++) {
+        catchUpCards.push(drawCard());
+      }
+      
+      const newPlayerCards: PlayerCards = {
+        playerId: newPlayer.id,
+        cards: catchUpCards,
+        drinksGiven: 0,
+        drinksTaken: 0,
+        matches: 0,
+      };
+      
+      setPlayerCards([...playerCards, newPlayerCards]);
+      toast.success(`${newPlayer.name} joined and caught up!`);
+    } else {
+      toast.success(`${newPlayer.name} joined!`);
+    }
+    
     setNewPlayerName("");
-    setIsAddPlayerOpen(false);
-    toast.success(`${newPlayer.name} joined the game!`);
   };
 
   const handleRemovePlayer = (playerId: string) => {
@@ -243,46 +270,125 @@ export default function RideBusPlay() {
 
     // Check for matches
     setTimeout(() => {
+      const matchingPlayers: string[] = [];
+      
       playerCards.forEach((pc) => {
         const player = players.find(p => p.id === pc.playerId);
         if (!player) return;
 
         const hasMatch = pc.cards.some(card => card.split("-")[0] === flippedRank);
         if (hasMatch) {
-          const updatedPlayerCards = playerCards.map(p => {
-            if (p.playerId === pc.playerId) {
-              return { ...p, matches: p.matches + 1 };
-            }
-            return p;
-          });
-          setPlayerCards(updatedPlayerCards);
-          
-          toast(`${player.name} matched a ${flippedRank}!`, {
-            description: "They must give or take a drink!",
-            style: { background: player.color, color: 'hsl(210 40% 98%)' }
-          });
+          matchingPlayers.push(pc.playerId);
         }
       });
+
+      // Process matches one at a time
+      if (matchingPlayers.length > 0) {
+        const playerId = matchingPlayers[0];
+        const player = players.find(p => p.id === playerId);
+        if (player) {
+          setCurrentMatchingPlayer(playerId);
+          setCurrentMatchingCard(flippedRank);
+          setGiveCardModalOpen(true);
+          
+          // Auto-default to "Take" after 5 seconds
+          giveCardTimeoutRef.current = setTimeout(() => {
+            handleTakeCard();
+          }, 5000);
+        }
+      }
     }, 600);
   };
 
+  const handleGiveCard = (recipientId: string) => {
+    if (giveCardTimeoutRef.current) {
+      clearTimeout(giveCardTimeoutRef.current);
+    }
+
+    const giver = players.find(p => p.id === currentMatchingPlayer);
+    const recipient = players.find(p => p.id === recipientId);
+    
+    if (giver && recipient && currentMatchingCard) {
+      // Transfer card
+      const updatedPlayerCards = playerCards.map(pc => {
+        if (pc.playerId === currentMatchingPlayer) {
+          // Remove the matching card from giver
+          const cardToRemove = pc.cards.find(c => c.split("-")[0] === currentMatchingCard);
+          return {
+            ...pc,
+            cards: pc.cards.filter(c => c !== cardToRemove),
+            matches: pc.matches + 1,
+          };
+        }
+        if (pc.playerId === recipientId) {
+          // Add card to recipient
+          const cardToAdd = playerCards
+            .find(p => p.playerId === currentMatchingPlayer)
+            ?.cards.find(c => c.split("-")[0] === currentMatchingCard);
+          
+          return {
+            ...pc,
+            cards: cardToAdd ? [...pc.cards, cardToAdd] : pc.cards,
+          };
+        }
+        return pc;
+      });
+      
+      setPlayerCards(updatedPlayerCards);
+      toast.success(`${giver.name} gave a ${currentMatchingCard} to ${recipient.name}!`);
+    }
+    
+    setGiveCardModalOpen(false);
+    setCurrentMatchingPlayer(null);
+    setCurrentMatchingCard(null);
+  };
+
+  const handleTakeCard = () => {
+    if (giveCardTimeoutRef.current) {
+      clearTimeout(giveCardTimeoutRef.current);
+    }
+
+    const player = players.find(p => p.id === currentMatchingPlayer);
+    
+    if (player && currentMatchingCard) {
+      // Increment matches only
+      const updatedPlayerCards = playerCards.map(pc => {
+        if (pc.playerId === currentMatchingPlayer) {
+          return { ...pc, matches: pc.matches + 1 };
+        }
+        return pc;
+      });
+      
+      setPlayerCards(updatedPlayerCards);
+      toast(`${player.name} took the ${currentMatchingCard}!`, {
+        style: { background: player.color, color: 'hsl(210 40% 98%)' }
+      });
+    }
+    
+    setGiveCardModalOpen(false);
+    setCurrentMatchingPlayer(null);
+    setCurrentMatchingCard(null);
+  };
+
   const determineBusRider = () => {
-    const maxMatches = Math.max(...playerCards.map(pc => pc.matches));
-    const riderData = playerCards.find(pc => pc.matches === maxMatches);
+    // Count total cards per player
+    const playerCardCounts = playerCards.map(pc => ({
+      playerId: pc.playerId,
+      totalCards: pc.cards.length,
+    }));
+
+    const maxCards = Math.max(...playerCardCounts.map(p => p.totalCards));
+    const riderData = playerCardCounts.find(p => p.totalCards === maxCards);
     
     if (riderData) {
       const rider = players.find(p => p.id === riderData.playerId);
       if (rider) {
         setBusRider(rider);
         setCurrentPhase("busRider");
-        
-        setTimeout(() => {
-          toast.success(`🚍 ${rider.name} RIDES THE BUS! 🍻`, {
-            duration: 5000,
-            style: { background: rider.color, color: 'hsl(210 40% 98%)', fontSize: '1.2rem' }
-          });
-        }, 500);
       }
+    } else {
+      // Fallback: no one rides
+      setCurrentPhase("finished");
     }
   };
 
@@ -332,13 +438,44 @@ export default function RideBusPlay() {
     <PageTransition>
       {/* Bus Rider Announcement Overlay */}
       {currentPhase === "busRider" && busRider && (
-        <BusRiderAnnouncement
-          playerName={busRider.name}
-          playerColor={busRider.color}
-          matchCount={playerCards.find(pc => pc.playerId === busRider.id)?.matches || 0}
-          onPlayAgain={handleRestart}
-          onBackToMenu={() => navigate("/")}
-        />
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center space-y-8 max-w-2xl px-6 animate-scale-in">
+            <div 
+              className="text-7xl font-black animate-text-glow"
+              style={{ color: busRider.color }}
+            >
+              🚍 BUS RIDER 🚍
+            </div>
+            
+            <div className="text-5xl font-bold text-foreground">
+              {busRider.name}
+            </div>
+            
+            <div className="text-xl text-muted-foreground">
+              Most cards = Rides the Bus!
+              <br />
+              Take 5 drinks 🍻
+            </div>
+            
+            <div className="flex gap-4 justify-center pt-8">
+              <Button 
+                size="lg"
+                onClick={handleRestart}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 text-lg"
+              >
+                🔁 Play Again
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate("/")}
+                className="border-secondary text-secondary hover:bg-secondary/10 font-bold px-8 py-6 text-lg"
+              >
+                🏠 Back to Menu
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="min-h-screen bg-background flex overflow-hidden">
@@ -359,19 +496,17 @@ export default function RideBusPlay() {
           {/* Player List */}
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-3">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide">
+              <div className="mb-3">
+                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide mb-2">
                   Players ({players.length})
                 </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsAddPlayerOpen(true)}
-                  className="h-7 px-2 hover:bg-primary/10"
-                >
-                  <UserPlus className="w-3.5 h-3.5 mr-1" />
-                  Add
-                </Button>
+                <Input
+                  value={newPlayerName}
+                  onChange={(e) => setNewPlayerName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
+                  placeholder="Add player..."
+                  className="h-8 text-sm"
+                />
               </div>
 
               {players.map((player) => {
@@ -394,32 +529,15 @@ export default function RideBusPlay() {
                       borderColor: isActive ? player.color : undefined,
                     } as React.CSSProperties}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar className={`w-8 h-8 border-2 ${isActive ? 'animate-glow-pulse' : ''}`} style={{ borderColor: isActive ? player.color : 'transparent' }}>
-                          <AvatarFallback style={{ backgroundColor: `${player.color}40`, color: player.color }}>
-                            {player.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className={`font-bold text-sm ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
-                            {player.name}
-                          </div>
-                          {isActive && (
-                            <div className="text-xs animate-glow-pulse" style={{ color: player.color }}>
-                              Your Turn!
-                            </div>
-                          )}
-                        </div>
+                    <div className="mb-2">
+                      <div className={`font-bold text-sm ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {player.name}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemovePlayer(player.id)}
-                        className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
+                      {isActive && (
+                        <div className="text-xs animate-glow-pulse mt-1" style={{ color: player.color }}>
+                          Your Turn!
+                        </div>
+                      )}
                     </div>
 
                     {/* Player's Cards */}
@@ -735,36 +853,39 @@ export default function RideBusPlay() {
         </div>
       </div>
 
-      {/* Add Player Dialog */}
-      <Dialog open={isAddPlayerOpen} onOpenChange={setIsAddPlayerOpen}>
-        <DialogContent>
+      {/* Give Card Modal */}
+      <Dialog open={giveCardModalOpen} onOpenChange={setGiveCardModalOpen}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Add New Player</DialogTitle>
+            <DialogTitle>You Matched a {currentMatchingCard}!</DialogTitle>
+            <DialogDescription>
+              Choose a player to give this card to, or it will default to "Take" in 5 seconds.
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="playerName">Player Name</Label>
-              <Input
-                id="playerName"
-                value={newPlayerName}
-                onChange={(e) => setNewPlayerName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
-                placeholder="Enter name..."
-                className="mt-2"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAddPlayer} className="flex-1">
-                Add Player
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsAddPlayerOpen(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-            </div>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {players
+              .filter(p => p.id !== currentMatchingPlayer)
+              .map((player) => (
+                <Button
+                  key={player.id}
+                  onClick={() => handleGiveCard(player.id)}
+                  variant="outline"
+                  className="w-full justify-start"
+                  style={{
+                    borderColor: player.color,
+                    color: player.color,
+                  }}
+                >
+                  Give to {player.name}
+                </Button>
+              ))}
+            <Button
+              onClick={handleTakeCard}
+              variant="secondary"
+              className="w-full"
+            >
+              Take It Yourself
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
