@@ -14,6 +14,9 @@ import HorseRacePlayer from "./pages/HorseRacePlayer";
 import BeerPongSettings from "./pages/BeerPongSettings";
 import BeerPongHost from "./pages/BeerPongHost";
 import BeerPongPlayer from "./pages/BeerPongPlayer";
+import RideBusSettings from "./pages/RideBusSettings";
+import RideBusHost from "./pages/RideBusHost";
+import RideBusPlayer from "./pages/RideBusPlayer";
 import Auth from "./pages/Auth";
 import AdminPanel from "./pages/AdminPanel";
 import Customization from "./pages/Customization";
@@ -45,6 +48,9 @@ const App = () => (
             <Route path="/game/beer-pong/setup" element={<BeerPongSettings />} />
             <Route path="/game/beer-pong/host/:sessionId" element={<BeerPongHost />} />
             <Route path="/game/beer-pong/player/:sessionId/:playerId" element={<BeerPongPlayer />} />
+            <Route path="/game/ride-bus/setup" element={<RideBusSettings />} />
+            <Route path="/game/ride-bus/host/:sessionId" element={<RideBusHost />} />
+            <Route path="/game/ride-bus/player/:sessionId/:playerId" element={<RideBusPlayer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
