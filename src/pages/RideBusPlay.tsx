@@ -68,6 +68,9 @@ export default function RideBusPlay() {
   const [currentMatchingPlayer, setCurrentMatchingPlayer] = useState<string | null>(null);
   const [currentMatchingCard, setCurrentMatchingCard] = useState<string | null>(null);
   const giveCardTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Deck ref to allow synchronous draws without state race conditions
+  const deckRef = useRef<string[]>([]);
   
   // Bus riding phase state
   const [busCards, setBusCards] = useState<string[]>([]);
@@ -92,24 +95,30 @@ export default function RideBusPlay() {
 
   useEffect(() => {
     const initialDeck = initializeDeck();
+    deckRef.current = initialDeck;
     setDeck(initialDeck);
     setDeckCount(initialDeck.length);
   }, []);
 
+  // Draw a single card synchronously from deckRef
   const drawCard = (): string => {
-    if (deck.length === 0) {
+    if (deckRef.current.length === 0) {
       const newDeck = initializeDeck();
-      setDeck(newDeck);
-      setDeckCount(52);
-      const card = newDeck[0];
-      setDeck(newDeck.slice(1));
-      setDeckCount(newDeck.length - 1);
-      return card;
+      deckRef.current = newDeck;
     }
-    const card = deck[0];
-    setDeck(deck.slice(1));
-    setDeckCount(deck.length - 1);
+    const card = deckRef.current.shift() as string;
+    setDeck([...deckRef.current]);
+    setDeckCount(deckRef.current.length);
     return card;
+  };
+
+  // Draw multiple cards at once to avoid duplicate pulls within same tick
+  const drawCards = (count: number): string[] => {
+    const result: string[] = [];
+    for (let i = 0; i < count; i++) {
+      result.push(drawCard());
+    }
+    return result;
   };
 
   const handleAddPlayer = () => {
@@ -249,7 +258,7 @@ export default function RideBusPlay() {
           } else {
             // Move to community card phase
             setCurrentPhase("community");
-            const newCommunityCards = Array.from({ length: 8 }, () => drawCard());
+            const newCommunityCards = drawCards(8);
             setCommunityCards(newCommunityCards);
             setFlippedCommunityCards(0);
           }
@@ -348,6 +357,13 @@ export default function RideBusPlay() {
     setGiveCardModalOpen(false);
     setCurrentMatchingPlayer(null);
     setCurrentMatchingCard(null);
+
+    // Continue automatically
+    if (flippedCommunityCards < communityCards.length) {
+      setTimeout(() => handleFlipCommunityCard(), 400);
+    } else {
+      setTimeout(() => determineBusRider(), 400);
+    }
   };
 
   const handleTakeCard = () => {
@@ -375,6 +391,13 @@ export default function RideBusPlay() {
     setGiveCardModalOpen(false);
     setCurrentMatchingPlayer(null);
     setCurrentMatchingCard(null);
+
+    // Continue automatically
+    if (flippedCommunityCards < communityCards.length) {
+      setTimeout(() => handleFlipCommunityCard(), 400);
+    } else {
+      setTimeout(() => determineBusRider(), 400);
+    }
   };
 
   const determineBusRider = () => {
@@ -758,60 +781,90 @@ export default function RideBusPlay() {
                         >
                           ⬇️ Lower
                         </Button>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <div 
-                          className="text-lg font-bold animate-glow-pulse"
-                          style={{ color: busRider.color }}
-                        >
-                          Drawing card...
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : currentPhase === "community" ? (
+) : currentPhase === "community" ? (
               // Community Card Phase
-              <div className="relative z-10 flex flex-col items-center gap-6">
-                <div className="text-center mb-4">
-                  <h2 className="text-2xl font-bold text-primary mb-2">Community Cards</h2>
-                  <p className="text-muted-foreground">Flip cards to find matches with your hand</p>
+              <div className="relative z-10 flex items-start gap-10">
+                {/* Deck + Flip control column */}
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative">
+                    <div className="absolute inset-0 rounded-xl blur-2xl opacity-50 transition-all duration-500" />
+                    <div className="relative">
+                      {[0, 1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className="absolute rounded-xl shadow-2xl"
+                          style={{
+                            width: '120px',
+                            height: '168px',
+                            transform: `translate(${i * 3}px, ${i * 3}px)`,
+                            zIndex: 3 - i,
+                            boxShadow: `0 ${8 + i * 4}px ${24 + i * 8}px rgba(0, 0, 0, 0.6)`,
+                          }}
+                        >
+                          {cardBackUrl ? (
+                            <img 
+                              src={cardBackUrl} 
+                              alt="Deck" 
+                              className="w-full h-full object-cover rounded-xl"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center">
+                              <div className="text-foreground text-3xl font-bold opacity-70">♠♥♦♣</div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      <div 
+                        className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border"
+                        style={{ backgroundColor: 'hsl(var(--primary)/0.2)' }}
+                      >
+                        {deckCount} cards
+                      </div>
+                      <div style={{ width: '120px', height: '168px', transform: 'translate(6px, 6px)' }} />
+                    </div>
+                  </div>
+                  {/* Fixed Flip Button Container */}
+                  <div className="w-[140px]">
+                    <Button
+                      onClick={handleFlipCommunityCard}
+                      disabled={flippedCommunityCards >= communityCards.length}
+                      size="lg"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
+                    >
+                      {flippedCommunityCards >= communityCards.length 
+                        ? 'Determining…' 
+                        : `Flip ${flippedCommunityCards + 1}`}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Community Cards Grid */}
-                <div className="grid grid-cols-4 gap-4">
-                  {communityCards.map((card, idx) => {
-                    const isFlipped = idx < flippedCommunityCards;
-                    
-                    return (
-                      <div
-                        key={idx}
-                        className={`w-24 h-32 transition-all duration-300 ${
-                          idx === flippedCommunityCards ? 'animate-card-flip scale-110' : ''
-                        }`}
-                      >
-                        <RideBusCard 
-                          card={card} 
-                          size="md" 
-                          faceDown={!isFlipped}
-                        />
-                      </div>
-                    );
-                  })}
+                <div className="flex-1">
+                  <div className="text-left mb-4">
+                    <h2 className="text-2xl font-bold text-primary mb-2">Community Cards</h2>
+                    <p className="text-muted-foreground">Flip cards to find matches with your hand</p>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4">
+                    {communityCards.map((card, idx) => {
+                      const isFlipped = idx < flippedCommunityCards;
+                      
+                      return (
+                        <div
+                          key={idx}
+                          className={`w-24 h-32 transition-all duration-300 ${
+                            idx === flippedCommunityCards ? 'animate-card-flip scale-110' : ''
+                          }`}
+                        >
+                          <RideBusCard 
+                            card={card} 
+                            size="md" 
+                            faceDown={!isFlipped}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-
-                <Button
-                  onClick={handleFlipCommunityCard}
-                  disabled={flippedCommunityCards >= communityCards.length}
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 text-lg shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 transition-all"
-                >
-                  {flippedCommunityCards >= communityCards.length 
-                    ? "Determining Bus Rider..." 
-                    : `Flip Card ${flippedCommunityCards + 1}`}
-                </Button>
               </div>
             ) : (
               // Regular Rounds - Deck and Choices
@@ -876,7 +929,7 @@ export default function RideBusPlay() {
                 )}
 
                 {/* Fixed Choice Button Container - Never moves or resizes */}
-                {!showResult && currentPlayer && players.length > 0 && (
+                {(currentPlayer && players.length > 0) && (
                   <div 
                     className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2"
                     style={{
