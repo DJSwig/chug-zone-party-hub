@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -44,7 +44,7 @@ interface PlayerCards {
   matches: number;
 }
 
-type GamePhase = "round1" | "round2" | "round3" | "round4" | "community" | "busRider" | "finished";
+type GamePhase = "round1" | "round2" | "round3" | "round4" | "community" | "busRider" | "ridingBus" | "finished";
 
 export default function RideBusPlay() {
   const navigate = useNavigate();
@@ -68,8 +68,13 @@ export default function RideBusPlay() {
   const [currentMatchingPlayer, setCurrentMatchingPlayer] = useState<string | null>(null);
   const [currentMatchingCard, setCurrentMatchingCard] = useState<string | null>(null);
   const giveCardTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Bus riding phase state
+  const [busCards, setBusCards] = useState<string[]>([]);
+  const [busDrinkCount, setBusDrinkCount] = useState(0);
+  const [busGuessing, setBusGuessing] = useState(false);
 
-  // Initialize a shuffled deck
+  // Initialize a shuffled deck with proper randomization
   const initializeDeck = (): string[] => {
     const newDeck: string[] = [];
     for (const suit of SUITS) {
@@ -77,7 +82,7 @@ export default function RideBusPlay() {
         newDeck.push(`${rank}-${suit}`);
       }
     }
-    // Fisher-Yates shuffle
+    // Fisher-Yates shuffle - truly random
     for (let i = newDeck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
@@ -86,7 +91,9 @@ export default function RideBusPlay() {
   };
 
   useEffect(() => {
-    setDeck(initializeDeck());
+    const initialDeck = initializeDeck();
+    setDeck(initialDeck);
+    setDeckCount(initialDeck.length);
   }, []);
 
   const drawCard = (): string => {
@@ -385,6 +392,11 @@ export default function RideBusPlay() {
       if (rider) {
         setBusRider(rider);
         setCurrentPhase("busRider");
+        // Show announcement for 3 seconds then start bus riding
+        setTimeout(() => {
+          setCurrentPhase("ridingBus");
+          startBusRiding();
+        }, 3000);
       }
     } else {
       // Fallback: no one rides
@@ -392,13 +404,77 @@ export default function RideBusPlay() {
     }
   };
 
+  const startBusRiding = () => {
+    // Start with first card
+    const firstCard = drawCard();
+    setBusCards([firstCard]);
+    setBusDrinkCount(0);
+    setBusGuessing(false);
+  };
+
+  const handleBusGuess = async (guess: "higher" | "lower") => {
+    if (busGuessing) return;
+    setBusGuessing(true);
+
+    const lastCard = busCards[busCards.length - 1];
+    const lastRank = RANKS.indexOf(lastCard.split("-")[0]);
+    
+    const nextCard = drawCard();
+    const nextRank = RANKS.indexOf(nextCard.split("-")[0]);
+
+    // Show the card
+    setTimeout(() => {
+      setBusCards([...busCards, nextCard]);
+      
+      const isCorrect = 
+        (guess === "higher" && nextRank > lastRank) || 
+        (guess === "lower" && nextRank < lastRank);
+
+      if (!isCorrect) {
+        // Wrong guess - restart and add drinks
+        const newDrinkCount = busDrinkCount + busCards.length;
+        setBusDrinkCount(newDrinkCount);
+        
+        toast.error(`Wrong! Take ${busCards.length} drinks! 🍻`, {
+          style: { background: 'hsl(0 84% 60%)', color: 'hsl(210 40% 98%)' }
+        });
+
+        setTimeout(() => {
+          // Restart the sequence
+          const firstCard = drawCard();
+          setBusCards([firstCard]);
+          setBusGuessing(false);
+        }, 2000);
+      } else {
+        // Correct guess
+        toast.success(`Correct! Keep going! ✅`, {
+          style: { background: 'hsl(142 76% 45%)', color: 'hsl(222 47% 11%)' }
+        });
+
+        // Check if they've made it through 4 cards
+        if (busCards.length >= 4) {
+          // They won!
+          setTimeout(() => {
+            toast.success(`${busRider?.name} made it through! Total drinks: ${busDrinkCount}`, {
+              style: { background: 'hsl(142 76% 45%)', color: 'hsl(222 47% 11%)' }
+            });
+            setCurrentPhase("finished");
+          }, 1500);
+        } else {
+          setBusGuessing(false);
+        }
+      }
+    }, 600);
+  };
+
   const handleRestart = () => {
     setCurrentPlayerIndex(0);
     setCurrentPhase("round1");
     setCurrentRound(1);
     setPlayerCards([]);
-    setDeck(initializeDeck());
-    setDeckCount(52);
+    const newDeck = initializeDeck();
+    setDeck(newDeck);
+    setDeckCount(newDeck.length);
     setCommunityCards([]);
     setFlippedCommunityCards(0);
     setSelectedChoice(null);
@@ -406,6 +482,9 @@ export default function RideBusPlay() {
     setShowResult(false);
     setBusRider(null);
     setIsAnimating(false);
+    setBusCards([]);
+    setBusDrinkCount(0);
+    setBusGuessing(false);
     toast.success("Game restarted!");
   };
 
@@ -420,6 +499,7 @@ export default function RideBusPlay() {
       case "round4": return "Pick a Suit";
       case "community": return "Community Cards";
       case "busRider": return "Bus Rider!";
+      case "ridingBus": return "Ride the Bus!";
       case "finished": return "Game Over";
       default: return "";
     }
@@ -454,8 +534,27 @@ export default function RideBusPlay() {
             <div className="text-xl text-muted-foreground">
               Most cards = Rides the Bus!
               <br />
-              Take 5 drinks 🍻
+              Guess higher or lower to get off the bus...
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Finished Overlay */}
+      {currentPhase === "finished" && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center">
+          <div className="text-center space-y-8 max-w-2xl px-6 animate-scale-in">
+            <div className="text-7xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              🎉 Game Over! 🎉
+            </div>
+            
+            {busRider && (
+              <div className="text-2xl text-muted-foreground">
+                {busRider.name} survived the bus!
+                <br />
+                Total drinks: {busDrinkCount} 🍻
+              </div>
+            )}
             
             <div className="flex gap-4 justify-center pt-8">
               <Button 
@@ -514,6 +613,7 @@ export default function RideBusPlay() {
                 const isActive = player.id === currentPlayer?.id && 
                                 currentPhase !== "community" && 
                                 currentPhase !== "busRider" && 
+                                currentPhase !== "ridingBus" && 
                                 currentPhase !== "finished";
 
                 return (
@@ -592,7 +692,87 @@ export default function RideBusPlay() {
               <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-spotlight" style={{ animationDelay: '5s' }} />
             </div>
 
-            {currentPhase === "community" ? (
+            {currentPhase === "ridingBus" && busRider ? (
+              // Bus Riding Phase - Higher or Lower
+              <div className="relative z-10 flex flex-col items-center gap-8">
+                <div className="text-center mb-4">
+                  <h2 className="text-3xl font-bold mb-2" style={{ color: busRider.color }}>
+                    {busRider.name} is Riding the Bus!
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Get through 4 cards in a row without missing
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Drinks so far: {busDrinkCount} 🍻
+                  </p>
+                </div>
+
+                {/* Bus Cards Display */}
+                <div className="flex gap-3 items-center min-h-[180px]">
+                  {busCards.map((card, idx) => (
+                    <div 
+                      key={idx}
+                      className="w-28 h-40 animate-scale-in"
+                      style={{ animationDelay: `${idx * 0.1}s` }}
+                    >
+                      <RideBusCard card={card} size="lg" />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Fixed Control Container - Never moves */}
+                <div className="w-full max-w-md">
+                  <div 
+                    className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2"
+                    style={{
+                      borderColor: busRider.color,
+                      boxShadow: `0 0 40px ${busRider.color}30`,
+                      minHeight: '180px'
+                    }}
+                  >
+                    <div className="text-center mb-4">
+                      <div className="text-sm text-muted-foreground mb-1">Card {busCards.length} of 4</div>
+                      <div 
+                        className="text-xl font-bold"
+                        style={{ color: busRider.color }}
+                      >
+                        Will the next card be...
+                      </div>
+                    </div>
+
+                    {!busGuessing ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        <Button
+                          onClick={() => handleBusGuess("higher")}
+                          size="lg"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-8 text-xl hover:scale-105 transition-all"
+                          disabled={busGuessing}
+                        >
+                          ⬆️ Higher
+                        </Button>
+                        <Button
+                          onClick={() => handleBusGuess("lower")}
+                          size="lg"
+                          className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold py-8 text-xl hover:scale-105 transition-all"
+                          disabled={busGuessing}
+                        >
+                          ⬇️ Lower
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div 
+                          className="text-lg font-bold animate-glow-pulse"
+                          style={{ color: busRider.color }}
+                        >
+                          Drawing card...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : currentPhase === "community" ? (
               // Community Card Phase
               <div className="relative z-10 flex flex-col items-center gap-6">
                 <div className="text-center mb-4">
@@ -695,13 +875,15 @@ export default function RideBusPlay() {
                   </div>
                 )}
 
-                {/* Choice Buttons */}
+                {/* Fixed Choice Button Container - Never moves or resizes */}
                 {!showResult && currentPlayer && players.length > 0 && (
                   <div 
-                    className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2 min-w-[400px]"
+                    className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2"
                     style={{
                       borderColor: currentPlayer.color,
-                      boxShadow: `0 0 40px ${currentPlayer.color}30`
+                      boxShadow: `0 0 40px ${currentPlayer.color}30`,
+                      minWidth: '420px',
+                      minHeight: '280px'
                     }}
                   >
                     <div className="text-center mb-4">
