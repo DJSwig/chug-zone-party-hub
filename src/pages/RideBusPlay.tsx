@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Settings, RotateCcw } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowLeft, RotateCcw, UserPlus, X } from "lucide-react";
 import { Player } from "@/types/game";
 import { PageTransition } from "@/components/PageTransition";
 import { RideBusCard } from "@/components/RideBusCard";
 import { useCardBack } from "@/hooks/useCardBack";
 import { toast } from "sonner";
-import { CenterDeck } from "@/components/ride-bus/CenterDeck";
-import { PlayerArea } from "@/components/ride-bus/PlayerArea";
-import { CommunityCardGrid } from "@/components/ride-bus/CommunityCardGrid";
 import { BusRiderAnnouncement } from "@/components/ride-bus/BusRiderAnnouncement";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const SUITS = ["hearts", "clubs", "diamonds", "spades"];
 const RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -327,23 +327,6 @@ export default function RideBusPlay() {
     return 0;
   };
 
-  const getPlayerPosition = (index: number, total: number): "top" | "right" | "bottom" | "left" => {
-    if (total <= 2) return index === 0 ? "bottom" : "top";
-    if (total === 3) {
-      if (index === 0) return "bottom";
-      if (index === 1) return "left";
-      return "right";
-    }
-    if (total === 4) {
-      if (index === 0) return "bottom";
-      if (index === 1) return "left";
-      if (index === 2) return "top";
-      return "right";
-    }
-    // For 5+ players, distribute around
-    const positions: ("top" | "right" | "bottom" | "left")[] = ["bottom", "left", "top", "top", "right", "right", "bottom", "left"];
-    return positions[index % positions.length];
-  };
 
   return (
     <PageTransition>
@@ -358,162 +341,276 @@ export default function RideBusPlay() {
         />
       )}
 
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Ambient background particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-spotlight" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-spotlight" style={{ animationDelay: '5s' }} />
-        </div>
-
-        {/* Top Navigation Bar */}
-        <div className="relative z-30 border-b border-border bg-card/50 backdrop-blur-md">
-          <div className="flex items-center justify-between px-6 py-4">
+      <div className="min-h-screen bg-background flex overflow-hidden">
+        {/* Left Sidebar - Player List */}
+        <div className="w-80 border-r border-border flex flex-col h-screen sticky top-0 shadow-[0_0_20px_hsl(var(--primary)/0.2)]">
+          <div className="p-4 border-b border-border flex-shrink-0 bg-card/50 backdrop-blur-sm">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/game/ride-bus/setup")}
-              className="text-muted-foreground hover:text-foreground"
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              Back to Setup
             </Button>
-
-            <div className="text-center">
-              <div className="text-sm text-muted-foreground mb-1">
-                {getRoundNumber() > 0 && `Round ${getRoundNumber()}`}
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                {getPhaseTitle()}
-              </h1>
-            </div>
-
-            <Dialog open={isAddPlayerOpen} onOpenChange={setIsAddPlayerOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Players ({players.length})
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Manage Players</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="playerName">Add New Player</Label>
-                    <div className="flex gap-2 mt-2">
-                      <Input
-                        id="playerName"
-                        value={newPlayerName}
-                        onChange={(e) => setNewPlayerName(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
-                        placeholder="Player name"
-                      />
-                      <Button onClick={handleAddPlayer}>Add</Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Current Players</Label>
-                    {players.map((player) => (
-                      <div key={player.id} className="flex items-center justify-between p-2 rounded border border-border">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: player.color }} />
-                          <span>{player.name}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemovePlayer(player.id)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
+
+          {/* Player List */}
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wide">
+                  Players ({players.length})
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsAddPlayerOpen(true)}
+                  className="h-7 px-2 hover:bg-primary/10"
+                >
+                  <UserPlus className="w-3.5 h-3.5 mr-1" />
+                  Add
+                </Button>
+              </div>
+
+              {players.map((player) => {
+                const pc = playerCards.find(p => p.playerId === player.id);
+                const isActive = player.id === currentPlayer?.id && 
+                                currentPhase !== "community" && 
+                                currentPhase !== "busRider" && 
+                                currentPhase !== "finished";
+
+                return (
+                  <Card
+                    key={player.id}
+                    className={`p-3 transition-all duration-300 ${
+                      isActive 
+                        ? 'border-2 shadow-[0_0_20px_var(--glow)]' 
+                        : 'border border-border'
+                    }`}
+                    style={{
+                      '--glow': isActive ? `${player.color}50` : 'transparent',
+                      borderColor: isActive ? player.color : undefined,
+                    } as React.CSSProperties}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar className={`w-8 h-8 border-2 ${isActive ? 'animate-glow-pulse' : ''}`} style={{ borderColor: isActive ? player.color : 'transparent' }}>
+                          <AvatarFallback style={{ backgroundColor: `${player.color}40`, color: player.color }}>
+                            {player.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className={`font-bold text-sm ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            {player.name}
+                          </div>
+                          {isActive && (
+                            <div className="text-xs animate-glow-pulse" style={{ color: player.color }}>
+                              Your Turn!
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemovePlayer(player.id)}
+                        className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+
+                    {/* Player's Cards */}
+                    {pc && pc.cards.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {pc.cards.map((card, idx) => (
+                          <div 
+                            key={idx}
+                            className="w-9 h-12 animate-scale-in"
+                            style={{ animationDelay: `${idx * 0.05}s` }}
+                          >
+                            <RideBusCard card={card} size="sm" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+
+              {players.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  <p>No players yet.</p>
+                  <p className="mt-1">Click Add to start!</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
         </div>
 
-
-        {/* Main Game Stage */}
-        <div className="relative flex-1 flex items-center justify-center p-8">
-          {/* Player Areas - Positioned around the stage */}
-          {players.map((player, idx) => {
-            const position = getPlayerPosition(idx, players.length);
-            const pc = playerCards.find(p => p.playerId === player.id);
-            const isActive = player.id === currentPlayer?.id && currentPhase !== "community" && currentPhase !== "busRider";
-            
-            const positionStyles = {
-              top: "absolute top-8 left-1/2 -translate-x-1/2",
-              right: "absolute right-8 top-1/2 -translate-y-1/2",
-              bottom: "absolute bottom-8 left-1/2 -translate-x-1/2",
-              left: "absolute left-8 top-1/2 -translate-y-1/2",
-            };
-
-            return (
-              <div key={player.id} className={positionStyles[position]}>
-                <PlayerArea
-                  name={player.name}
-                  color={player.color}
-                  cards={pc?.cards || []}
-                  isActive={isActive}
-                  position={position}
-                />
+        {/* Main Game Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Top Bar - Current Phase */}
+          <div className="flex items-center justify-center py-4 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+            <Card className="px-8 py-3 bg-card border-primary shadow-[0_0_30px_hsl(var(--primary)/0.5)]">
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground mb-1">
+                  {getRoundNumber() > 0 && `Round ${getRoundNumber()} of 4`}
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                  {getPhaseTitle()}
+                </h1>
               </div>
-            );
-          })}
+            </Card>
+          </div>
 
-          {/* Center Stage Content */}
-          <div className="relative z-10">
+          {/* Center Stage Area */}
+          <div className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
+            {/* Ambient background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-spotlight" />
+              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-spotlight" style={{ animationDelay: '5s' }} />
+            </div>
+
             {currentPhase === "community" ? (
               // Community Card Phase
-              <CommunityCardGrid
-                cards={communityCards}
-                flippedCount={flippedCommunityCards}
-                onFlipNext={handleFlipCommunityCard}
-              />
-            ) : (
-              // Regular Rounds - Center deck with choices
-              <div className="flex flex-col items-center gap-8">
-                {/* Center Deck */}
-                <CenterDeck 
-                  cardCount={deckCount}
-                  glowColor={currentPlayer?.color}
-                  isAnimating={isAnimating}
-                />
+              <div className="relative z-10 flex flex-col items-center gap-6">
+                <div className="text-center mb-4">
+                  <h2 className="text-2xl font-bold text-primary mb-2">Community Cards</h2>
+                  <p className="text-muted-foreground">Flip cards to find matches with your hand</p>
+                </div>
 
-                {/* Current card being shown */}
+                {/* Community Cards Grid */}
+                <div className="grid grid-cols-4 gap-4">
+                  {communityCards.map((card, idx) => {
+                    const isFlipped = idx < flippedCommunityCards;
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className={`w-24 h-32 transition-all duration-300 ${
+                          idx === flippedCommunityCards ? 'animate-card-flip scale-110' : ''
+                        }`}
+                      >
+                        <RideBusCard 
+                          card={card} 
+                          size="md" 
+                          faceDown={!isFlipped}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  onClick={handleFlipCommunityCard}
+                  disabled={flippedCommunityCards >= communityCards.length}
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 text-lg shadow-[0_0_30px_hsl(var(--primary)/0.5)] hover:scale-105 transition-all"
+                >
+                  {flippedCommunityCards >= communityCards.length 
+                    ? "Determining Bus Rider..." 
+                    : `Flip Card ${flippedCommunityCards + 1}`}
+                </Button>
+              </div>
+            ) : (
+              // Regular Rounds - Deck and Choices
+              <div className="relative z-10 flex flex-col items-center gap-8">
+                {/* Center Deck */}
+                <div className="relative">
+                  <div 
+                    className="absolute inset-0 rounded-xl blur-2xl opacity-50 transition-all duration-500"
+                    style={{ 
+                      backgroundColor: currentPlayer?.color || 'hsl(var(--primary))',
+                      animation: isAnimating ? 'pulse 1s infinite' : 'none'
+                    }}
+                  />
+                  
+                  <div className="relative">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="absolute rounded-xl shadow-2xl"
+                        style={{
+                          width: '120px',
+                          height: '168px',
+                          transform: `translate(${i * 3}px, ${i * 3}px)`,
+                          zIndex: 3 - i,
+                          boxShadow: `0 ${8 + i * 4}px ${24 + i * 8}px rgba(0, 0, 0, 0.6)`,
+                        }}
+                      >
+                        {cardBackUrl ? (
+                          <img 
+                            src={cardBackUrl} 
+                            alt="Deck" 
+                            className="w-full h-full object-cover rounded-xl"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary via-secondary to-accent rounded-xl flex items-center justify-center">
+                            <div className="text-foreground text-3xl font-bold opacity-70">♠♥♦♣</div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <div 
+                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border"
+                      style={{ 
+                        backgroundColor: `${currentPlayer?.color || 'hsl(var(--primary))'}20`,
+                        borderColor: currentPlayer?.color || 'hsl(var(--primary))',
+                        color: currentPlayer?.color || 'hsl(var(--primary))'
+                      }}
+                    >
+                      {deckCount} cards
+                    </div>
+                    
+                    <div style={{ width: '120px', height: '168px', transform: 'translate(6px, 6px)' }} />
+                  </div>
+                </div>
+
+                {/* Current card being revealed */}
                 {showResult && lastDrawnCard && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 animate-card-flip">
+                  <div className="animate-card-flip">
                     <RideBusCard card={lastDrawnCard} size="lg" />
                   </div>
                 )}
 
-                {/* Choice Interface */}
+                {/* Choice Buttons */}
                 {!showResult && currentPlayer && players.length > 0 && (
+                  <div 
+                    className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2 min-w-[400px]"
+                    style={{
+                      borderColor: currentPlayer.color,
+                      boxShadow: `0 0 40px ${currentPlayer.color}30`
+                    }}
+                  >
+                    <div className="text-center mb-4">
+                      <div className="text-sm text-muted-foreground mb-1">Current Player</div>
+                      <div 
+                        className="text-xl font-bold animate-glow-pulse"
+                        style={{ color: currentPlayer.color }}
+                      >
+                        {currentPlayer.name}
+                      </div>
+                    </div>
 
-                  <div className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2 min-w-[400px]" style={{
-                    borderColor: currentPlayer.color,
-                    boxShadow: `0 0 40px ${currentPlayer.color}30`
-                  }}>
                     {!selectedChoice ? (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {currentPhase === "round1" && (
                           <div className="grid grid-cols-2 gap-3">
                             <Button
                               onClick={() => handleChoice("red")}
                               size="lg"
-                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-8 text-xl transition-all hover:scale-105 shadow-[0_0_20px_hsl(var(--destructive)/0.4)]"
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-8 text-xl hover:scale-105 transition-all"
                             >
                               ❤️ Red
                             </Button>
                             <Button
                               onClick={() => handleChoice("black")}
                               size="lg"
-                              className="bg-foreground hover:bg-foreground/90 text-background font-bold py-8 text-xl transition-all hover:scale-105"
+                              className="bg-foreground hover:bg-foreground/90 text-background font-bold py-8 text-xl hover:scale-105 transition-all"
                             >
                               ♠️ Black
                             </Button>
@@ -525,14 +622,14 @@ export default function RideBusPlay() {
                             <Button
                               onClick={() => handleChoice("higher")}
                               size="lg"
-                              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-8 text-xl transition-all hover:scale-105 shadow-[0_0_20px_hsl(var(--primary)/0.4)]"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-8 text-xl hover:scale-105 transition-all"
                             >
                               ⬆️ Higher
                             </Button>
                             <Button
                               onClick={() => handleChoice("lower")}
                               size="lg"
-                              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold py-8 text-xl transition-all hover:scale-105 shadow-[0_0_20px_hsl(var(--secondary)/0.4)]"
+                              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold py-8 text-xl hover:scale-105 transition-all"
                             >
                               ⬇️ Lower
                             </Button>
@@ -544,11 +641,10 @@ export default function RideBusPlay() {
                             <Button
                               onClick={() => handleChoice("inside")}
                               size="lg"
-                              className="font-bold py-8 text-xl transition-all hover:scale-105"
+                              className="font-bold py-8 text-xl hover:scale-105 transition-all"
                               style={{ 
                                 backgroundColor: 'hsl(277 85% 60%)',
-                                color: 'hsl(210 40% 98%)',
-                                boxShadow: '0 0 20px hsl(277 85% 60% / 0.4)'
+                                color: 'hsl(210 40% 98%)'
                               }}
                             >
                               📍 Inside
@@ -556,11 +652,10 @@ export default function RideBusPlay() {
                             <Button
                               onClick={() => handleChoice("outside")}
                               size="lg"
-                              className="font-bold py-8 text-xl transition-all hover:scale-105"
+                              className="font-bold py-8 text-xl hover:scale-105 transition-all"
                               style={{ 
                                 backgroundColor: 'hsl(25 95% 53%)',
-                                color: 'hsl(210 40% 98%)',
-                                boxShadow: '0 0 20px hsl(25 95% 53% / 0.4)'
+                                color: 'hsl(210 40% 98%)'
                               }}
                             >
                               🌐 Outside
@@ -572,13 +667,13 @@ export default function RideBusPlay() {
                           <div className="grid grid-cols-2 gap-3">
                             <Button
                               onClick={() => handleChoice("hearts")}
-                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-6 text-lg transition-all hover:scale-105"
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-bold py-6 text-lg hover:scale-105 transition-all"
                             >
                               ♥️ Hearts
                             </Button>
                             <Button
                               onClick={() => handleChoice("clubs")}
-                              className="font-bold py-6 text-lg transition-all hover:scale-105"
+                              className="font-bold py-6 text-lg hover:scale-105 transition-all"
                               style={{ 
                                 backgroundColor: 'hsl(142 76% 35%)',
                                 color: 'hsl(210 40% 98%)'
@@ -588,13 +683,13 @@ export default function RideBusPlay() {
                             </Button>
                             <Button
                               onClick={() => handleChoice("diamonds")}
-                              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold py-6 text-lg transition-all hover:scale-105"
+                              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold py-6 text-lg hover:scale-105 transition-all"
                             >
                               ♦️ Diamonds
                             </Button>
                             <Button
                               onClick={() => handleChoice("spades")}
-                              className="bg-foreground hover:bg-foreground/90 text-background font-bold py-6 text-lg transition-all hover:scale-105"
+                              className="bg-foreground hover:bg-foreground/90 text-background font-bold py-6 text-lg hover:scale-105 transition-all"
                             >
                               ♠️ Spades
                             </Button>
@@ -603,7 +698,10 @@ export default function RideBusPlay() {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <div className="text-lg font-bold animate-glow-pulse" style={{ color: currentPlayer.color }}>
+                        <div 
+                          className="text-lg font-bold animate-glow-pulse"
+                          style={{ color: currentPlayer.color }}
+                        >
                           Drawing card...
                         </div>
                       </div>
@@ -611,17 +709,65 @@ export default function RideBusPlay() {
                   </div>
                 )}
 
-                {/* Empty state */}
                 {players.length === 0 && (
                   <div className="text-center p-8 bg-card/50 backdrop-blur-sm rounded-xl">
-                    <p className="text-xl text-muted-foreground">Add players to start the game</p>
+                    <p className="text-xl text-muted-foreground">Add players from the sidebar to start!</p>
                   </div>
                 )}
               </div>
             )}
           </div>
+
+          {/* Bottom Controls */}
+          <div className="sticky bottom-0 border-t border-border bg-card/95 backdrop-blur-sm p-3 z-10">
+            <div className="max-w-4xl mx-auto flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRestart}
+                className="border-secondary text-secondary hover:bg-secondary/10 hover:scale-105 transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                Restart Game
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Add Player Dialog */}
+      <Dialog open={isAddPlayerOpen} onOpenChange={setIsAddPlayerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Player</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="playerName">Player Name</Label>
+              <Input
+                id="playerName"
+                value={newPlayerName}
+                onChange={(e) => setNewPlayerName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
+                placeholder="Enter name..."
+                className="mt-2"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleAddPlayer} className="flex-1">
+                Add Player
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsAddPlayerOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }
