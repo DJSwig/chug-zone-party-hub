@@ -15,7 +15,8 @@ export const RideBusCard = ({ card, size = "sm", className = "", faceDown = fals
   
   return (
     <PlayingCard 
-      suit={suit} 
+      suit={suit}
+      rank={rank}
       size={size} 
       className={className} 
       faceDown={faceDown} 

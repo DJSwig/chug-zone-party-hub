@@ -3,16 +3,17 @@ import { useCardBack } from "@/hooks/useCardBack";
 
 interface PlayingCardProps {
   suit: Suit;
+  rank?: string;
   size?: "sm" | "md" | "lg";
   className?: string;
   faceDown?: boolean;
 }
 
 const SUIT_CONFIG = {
-  spades: { symbol: "♠", color: "text-foreground", name: "A" },
-  hearts: { symbol: "♥", color: "text-primary", name: "A" },
-  diamonds: { symbol: "♦", color: "text-primary", name: "A" },
-  clubs: { symbol: "♣", color: "text-foreground", name: "A" },
+  spades: { symbol: "♠", color: "text-foreground" },
+  hearts: { symbol: "♥", color: "text-primary" },
+  diamonds: { symbol: "♦", color: "text-primary" },
+  clubs: { symbol: "♣", color: "text-foreground" },
 };
 
 const SIZE_CLASSES = {
@@ -27,7 +28,7 @@ const FONT_SIZES = {
   lg: "text-4xl",
 };
 
-export const PlayingCard = ({ suit, size = "md", className = "", faceDown = false }: PlayingCardProps) => {
+export const PlayingCard = ({ suit, rank = "A", size = "md", className = "", faceDown = false }: PlayingCardProps) => {
   const config = SUIT_CONFIG[suit];
   const { cardBackUrl } = useCardBack();
   
@@ -56,7 +57,7 @@ export const PlayingCard = ({ suit, size = "md", className = "", faceDown = fals
       className={`${SIZE_CLASSES[size]} bg-card rounded-lg shadow-lg flex flex-col items-center justify-center gap-1 p-2 ${className}`}
     >
       <div className={`${FONT_SIZES[size]} font-bold ${config.color} leading-none`}>
-        {config.name}
+        {rank}
       </div>
       <div className={`${FONT_SIZES[size]} ${config.color} leading-none`}>
         {config.symbol}
