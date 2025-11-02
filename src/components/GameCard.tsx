@@ -15,8 +15,6 @@ export const GameCard = ({ game }: GameCardProps) => {
       navigate(`/game/horse-race/setup`);
     } else if (game.id === "beer-pong") {
       navigate(`/game/beer-pong/setup`);
-    } else if (game.id === "ride-bus") {
-      navigate(`/game/ride-bus/setup`);
     } else {
       navigate(`/game/${game.id}/settings`);
     }

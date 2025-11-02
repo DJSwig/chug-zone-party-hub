@@ -25,12 +25,4 @@ export const games: Game[] = [
     minPlayers: 2,
     maxPlayers: 16,
   },
-  {
-    id: "ride-bus",
-    name: "Ride the Bus",
-    description: "The ultimate card guessing game - red or black, higher or lower, and more!",
-    emoji: "🚌🎴",
-    minPlayers: 2,
-    maxPlayers: 12,
-  },
 ];

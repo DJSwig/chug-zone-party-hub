@@ -46,31 +46,3 @@ export interface HorseRaceState {
 }
 
 export type Suit = 'spades' | 'hearts' | 'diamonds' | 'clubs';
-
-export interface RideBusPlayerCards {
-  player_id: string;
-  player_name: string;
-  cards: string[];
-  drinks_given: number;
-  drinks_taken: number;
-}
-
-export interface RideBusChoice {
-  player_id: string;
-  player_name: string;
-  choice: string;
-  result?: 'correct' | 'wrong';
-  card?: string;
-}
-
-export interface RideBusState {
-  session_id: string;
-  current_phase: 'round1' | 'round2' | 'round3' | 'round4' | 'bus' | 'finished';
-  current_round: number;
-  current_player_index: number;
-  player_cards: RideBusPlayerCards[];
-  bus_cards: string[];
-  flipped_bus_cards: number;
-  choices: RideBusChoice[];
-  updated_at: string;
-}
