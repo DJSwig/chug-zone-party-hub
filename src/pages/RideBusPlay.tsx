@@ -781,7 +781,21 @@ export default function RideBusPlay() {
                         >
                           ⬇️ Lower
                         </Button>
-) : currentPhase === "community" ? (
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div 
+                          className="text-lg font-bold animate-glow-pulse"
+                          style={{ color: busRider.color }}
+                        >
+                          Drawing card...
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : currentPhase === "community" ? (
               // Community Card Phase
               <div className="relative z-10 flex items-start gap-10">
                 {/* Deck + Flip control column */}
@@ -928,28 +942,29 @@ export default function RideBusPlay() {
                   </div>
                 )}
 
-                {/* Fixed Choice Button Container - Never moves or resizes */}
-                {(currentPlayer && players.length > 0) && (
-                  <div 
-                    className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2"
-                    style={{
-                      borderColor: currentPlayer.color,
-                      boxShadow: `0 0 40px ${currentPlayer.color}30`,
-                      minWidth: '420px',
-                      minHeight: '280px'
-                    }}
-                  >
-                    <div className="text-center mb-4">
-                      <div className="text-sm text-muted-foreground mb-1">Current Player</div>
-                      <div 
-                        className="text-xl font-bold animate-glow-pulse"
-                        style={{ color: currentPlayer.color }}
-                      >
-                        {currentPlayer.name}
+                {/* Fixed Choice Button Container - Always present */}
+                <div 
+                  className="bg-card/90 backdrop-blur-md rounded-2xl p-6 border-2"
+                  style={{
+                    borderColor: currentPlayer?.color || 'hsl(var(--primary))',
+                    boxShadow: `0 0 40px ${currentPlayer?.color || 'hsl(var(--primary))'}30`,
+                    minWidth: '420px',
+                    minHeight: '280px'
+                  }}
+                >
+                  {!showResult && currentPlayer && players.length > 0 ? (
+                    <>
+                      <div className="text-center mb-4">
+                        <div className="text-sm text-muted-foreground mb-1">Current Player</div>
+                        <div 
+                          className="text-xl font-bold animate-glow-pulse"
+                          style={{ color: currentPlayer.color }}
+                        >
+                          {currentPlayer.name}
+                        </div>
                       </div>
-                    </div>
 
-                    {!selectedChoice ? (
+                      {!selectedChoice ? (
                       <div className="space-y-3">
                         {currentPhase === "round1" && (
                           <div className="grid grid-cols-2 gap-3">
@@ -1049,18 +1064,25 @@ export default function RideBusPlay() {
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <div 
-                          className="text-lg font-bold animate-glow-pulse"
-                          style={{ color: currentPlayer.color }}
-                        >
-                          Drawing card...
+                      ) : (
+                        <div className="text-center py-8">
+                          <div 
+                            className="text-lg font-bold animate-glow-pulse"
+                            style={{ color: currentPlayer.color }}
+                          >
+                            Drawing card...
+                          </div>
                         </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-lg text-muted-foreground">
+                        {players.length === 0 ? 'Add players to start' : 'Waiting for turn...'}
                       </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
 
                 {players.length === 0 && (
                   <div className="text-center p-8 bg-card/50 backdrop-blur-sm rounded-xl">
