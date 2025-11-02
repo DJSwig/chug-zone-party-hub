@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Play, SkipForward } from "lucide-react";
 import { PageTransition } from "@/components/PageTransition";
 import { JoinCodeDisplay } from "@/components/JoinCodeDisplay";
-import { PlayingCard } from "@/components/PlayingCard";
+import { RideBusCard } from "@/components/RideBusCard";
 import { useGameSession } from "@/hooks/useGameSession";
 import { useCardBack } from "@/hooks/useCardBack";
 import { supabase } from "@/integrations/supabase/client";
@@ -172,7 +172,7 @@ export default function RideBusHost() {
     await supabase
       .from("ride_bus_state")
       .update({
-        player_cards: updatedPlayerCards,
+        player_cards: updatedPlayerCards as any,
         choices: [
           ...gameState.choices,
           {
@@ -182,7 +182,7 @@ export default function RideBusHost() {
             result: isCorrect ? "correct" : "wrong",
             card,
           },
-        ],
+        ] as any,
       })
       .eq("session_id", sessionId);
 
@@ -230,7 +230,7 @@ export default function RideBusHost() {
               Leave
             </Button>
             
-            {session.status === "waiting" && <JoinCodeDisplay code={session.join_code} />}
+            {session.status === "waiting" && <JoinCodeDisplay joinCode={session.join_code} />}
             
             <div className="text-sm text-muted-foreground">
               {players.length} Player{players.length !== 1 ? "s" : ""}
@@ -291,7 +291,7 @@ export default function RideBusHost() {
                       <h3 className="font-bold text-foreground mb-2">{player.player_name}</h3>
                       <div className="flex gap-1 mb-2 flex-wrap">
                         {pc?.cards.map((card, idx) => (
-                          <PlayingCard key={idx} card={card} size="xs" />
+                          <RideBusCard key={idx} card={card} size="sm" />
                         ))}
                       </div>
                       <div className="text-xs text-muted-foreground">

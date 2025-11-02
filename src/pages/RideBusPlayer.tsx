@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageTransition } from "@/components/PageTransition";
-import { PlayingCard } from "@/components/PlayingCard";
+import { RideBusCard } from "@/components/RideBusCard";
 import { useGameSession } from "@/hooks/useGameSession";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -77,7 +77,7 @@ export default function RideBusPlayer() {
             player_name: currentPlayer?.player_name || "Unknown",
             choice,
           },
-        ],
+        ] as any,
       })
       .eq("session_id", sessionId);
   };
@@ -108,7 +108,7 @@ export default function RideBusPlayer() {
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Your Cards</h3>
                 <div className="flex gap-2 justify-center flex-wrap">
                   {playerCards.cards.map((card, idx) => (
-                    <PlayingCard key={idx} card={card} size="sm" />
+                    <RideBusCard key={idx} card={card} size="sm" />
                   ))}
                 </div>
               </div>

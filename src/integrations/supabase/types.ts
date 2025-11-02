@@ -231,6 +231,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ride_bus_state: {
+        Row: {
+          bus_cards: Json | null
+          choices: Json | null
+          current_phase: string
+          current_player_index: number
+          current_round: number
+          flipped_bus_cards: number | null
+          player_cards: Json | null
+          session_id: string
+          updated_at: string
+        }
+        Insert: {
+          bus_cards?: Json | null
+          choices?: Json | null
+          current_phase?: string
+          current_player_index?: number
+          current_round?: number
+          flipped_bus_cards?: number | null
+          player_cards?: Json | null
+          session_id: string
+          updated_at?: string
+        }
+        Update: {
+          bus_cards?: Json | null
+          choices?: Json | null
+          current_phase?: string
+          current_player_index?: number
+          current_round?: number
+          flipped_bus_cards?: number | null
+          player_cards?: Json | null
+          session_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_bus_state_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: true
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_players: {
         Row: {
           id: string
