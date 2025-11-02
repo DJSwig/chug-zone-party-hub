@@ -67,6 +67,8 @@ const Join = () => {
         navigate(`/game/horse-race/player/${session.id}/${player.id}`);
       } else if (session.game_type === "beer-pong") {
         navigate(`/game/beer-pong/player/${session.id}/${player.id}`);
+      } else if (session.game_type === "ride-bus") {
+        navigate(`/game/ride-bus/player/${session.id}/${player.id}`);
       } else {
         // Fallback for any other game types
         toast.info("Game type not recognized, staying on join screen");
