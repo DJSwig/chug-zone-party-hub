@@ -117,7 +117,21 @@ export default function Customization() {
       console.log('Public URL:', publicUrl);
       setCustomCardBackUrl(publicUrl);
       setSelectedCardBack('custom');
-      toast.success('Card back uploaded!');
+      
+      // Auto-save after successful upload
+      await supabase
+        .from('customizations')
+        .upsert(
+          {
+            user_id: user?.id!,
+            theme: theme,
+            card_back_url: publicUrl,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
+      
+      toast.success('Card back uploaded and saved!');
     } catch (error) {
       console.error('Error uploading file:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to upload card back';
