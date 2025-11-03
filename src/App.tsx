@@ -17,6 +17,8 @@ import BeerPongPlayer from "./pages/BeerPongPlayer";
 import Auth from "./pages/Auth";
 import AdminPanel from "./pages/AdminPanel";
 import Customization from "./pages/Customization";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 import { AdminNotesOverlay } from "./components/AdminNotesOverlay";
 
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/game/beer-pong/setup" element={<BeerPongSettings />} />
             <Route path="/game/beer-pong/host/:sessionId" element={<BeerPongHost />} />
             <Route path="/game/beer-pong/player/:sessionId/:playerId" element={<BeerPongPlayer />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

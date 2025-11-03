@@ -75,17 +75,17 @@ export const FooterSection = () => {
               <h4 className="text-lg font-bold mb-4 text-foreground">Legal & Contact</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
+                  <a href="/terms" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
                     Terms of Service
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
+                  <a href="/privacy" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
                     Privacy Policy
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:contact@chugzone.com" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
+                  <a href="https://discord.gg/CmHurTx49j" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-[hsl(var(--neon-purple))] transition-colors">
                     Contact Us
                   </a>
                 </li>
