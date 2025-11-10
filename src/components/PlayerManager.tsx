@@ -123,7 +123,7 @@ export const PlayerManager = ({
       {players.length > 0 && (
         <div className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
           players.length > 8 
-            ? 'grid grid-cols-2 gap-x-3 gap-y-2 content-start items-start' 
+            ? 'grid grid-cols-2 gap-x-4 gap-y-2 content-start items-start' 
             : 'flex flex-col gap-2'
         }`}>
           {players.map((player, index) => (
@@ -151,11 +151,11 @@ export const PlayerManager = ({
                 <Input
                   value={player.name}
                   onChange={(e) => handleNameChange(player.id, e.target.value)}
-                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full truncate"
+                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
                   title={player.name}
                 />
               </div>
-              {player.name.length > 15 && (
+              {player.name.length > 12 && (
                 <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
                   {player.name}
                 </div>
