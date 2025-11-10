@@ -121,11 +121,14 @@ export const PlayerManager = ({
 
       {/* Player Grid - No Scrolling, Expands Vertically Then Horizontally */}
       {players.length > 0 && (
-        <div className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
-          players.length > 8 
-            ? 'grid grid-cols-2 gap-x-2.5 gap-y-2 content-start items-start' 
-            : 'flex flex-col gap-2'
-        }`}>
+        <div 
+          className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
+            players.length > 8 
+              ? 'grid grid-cols-2 grid-flow-col gap-x-2.5 gap-y-2 content-start items-start' 
+              : 'flex flex-col gap-2'
+          }`}
+          style={players.length > 8 ? { gridTemplateRows: `repeat(${Math.ceil(players.length / 2)}, minmax(0, 1fr))` } : undefined}
+        >
           {players.map((player, index) => (
             <div
               key={player.id}
