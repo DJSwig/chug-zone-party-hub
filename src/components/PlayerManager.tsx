@@ -3,6 +3,7 @@ import { Player } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Plus, X, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 
@@ -121,59 +122,160 @@ export const PlayerManager = ({
 
       {/* Player Grid - No Scrolling, Expands Vertically Then Horizontally */}
       {players.length > 0 && (
-        <div 
-          className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
-            players.length > 8 
-              ? 'grid grid-cols-2 grid-flow-col gap-x-2.5 gap-y-2 content-start items-start' 
-              : 'flex flex-col gap-2'
-          }`}
-          style={players.length > 8 ? { gridTemplateRows: `repeat(${Math.ceil(players.length / 2)}, minmax(0, 1fr))` } : undefined}
-        >
-          {players.map((player, index) => (
-            <div
-              key={player.id}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
-              className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
-                index === currentPlayerIndex
-                  ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
-                  : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
-              } ${
-                draggedIndex === index ? "opacity-50" : ""
-              } ${
-                draggedOverIndex === index && draggedIndex !== null && draggedIndex !== index
-                  ? "border-primary/60 scale-105"
-                  : ""
-              }`}
-            >
-              <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 cursor-grab active:cursor-grabbing" />
-              <div className="flex-1 min-w-0 overflow-hidden">
-                <Input
-                  value={player.name}
-                  onChange={(e) => handleNameChange(player.id, e.target.value)}
-                  className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
-                  title={player.name}
-                />
+        <>
+          {players.length > 8 ? (
+            <div className="mb-4 flex-1 min-h-0 transition-all duration-300 ease-out flex gap-2.5">
+              {/* Left Column */}
+              <div className="flex-1 flex flex-col gap-2">
+                {players.slice(0, Math.ceil(players.length / 2)).map((player, index) => (
+                  <div
+                    key={player.id}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
+                      index === currentPlayerIndex
+                        ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
+                        : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+                    } ${
+                      draggedIndex === index ? "opacity-50" : ""
+                    } ${
+                      draggedOverIndex === index && draggedIndex !== null && draggedIndex !== index
+                        ? "border-primary/60 scale-105"
+                        : ""
+                    }`}
+                  >
+                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 cursor-grab active:cursor-grabbing" />
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <Input
+                        value={player.name}
+                        onChange={(e) => handleNameChange(player.id, e.target.value)}
+                        className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                        title={player.name}
+                      />
+                    </div>
+                    {player.name.length > 12 && (
+                      <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                        {player.name}
+                      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemovePlayer(player.id)}
+                      className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))}
               </div>
-              {player.name.length > 12 && (
-                <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
-                  {player.name}
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleRemovePlayer(player.id)}
-                className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6 transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </Button>
+
+              {/* Separator */}
+              <Separator orientation="vertical" className="bg-border/50" />
+
+              {/* Right Column */}
+              <div className="flex-1 flex flex-col gap-2">
+                {players.slice(Math.ceil(players.length / 2)).map((player, idx) => {
+                  const index = Math.ceil(players.length / 2) + idx;
+                  return (
+                    <div
+                      key={player.id}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDrop={(e) => handleDrop(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
+                        index === currentPlayerIndex
+                          ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
+                          : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+                      } ${
+                        draggedIndex === index ? "opacity-50" : ""
+                      } ${
+                        draggedOverIndex === index && draggedIndex !== null && draggedIndex !== index
+                          ? "border-primary/60 scale-105"
+                          : ""
+                      }`}
+                    >
+                      <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 cursor-grab active:cursor-grabbing" />
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <Input
+                          value={player.name}
+                          onChange={(e) => handleNameChange(player.id, e.target.value)}
+                          className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                          title={player.name}
+                        />
+                      </div>
+                      {player.name.length > 12 && (
+                        <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                          {player.name}
+                        </div>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemovePlayer(player.id)}
+                        className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          ))}
-        </div>
+          ) : (
+            <div className="mb-4 flex-1 min-h-0 transition-all duration-300 ease-out flex flex-col gap-2">
+              {players.map((player, index) => (
+                <div
+                  key={player.id}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
+                    index === currentPlayerIndex
+                      ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
+                      : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+                  } ${
+                    draggedIndex === index ? "opacity-50" : ""
+                  } ${
+                    draggedOverIndex === index && draggedIndex !== null && draggedIndex !== index
+                      ? "border-primary/60 scale-105"
+                      : ""
+                  }`}
+                >
+                  <GripVertical className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 cursor-grab active:cursor-grabbing" />
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <Input
+                      value={player.name}
+                      onChange={(e) => handleNameChange(player.id, e.target.value)}
+                      className="bg-transparent border-none focus-visible:ring-0 text-foreground font-medium text-sm h-auto p-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                      title={player.name}
+                    />
+                  </div>
+                  {player.name.length > 12 && (
+                    <div className="absolute left-0 top-full mt-1 px-3 py-2 bg-card border-2 border-primary rounded-lg shadow-[0_0_20px_hsl(var(--primary)/0.5)] z-[100] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap text-sm font-medium text-foreground">
+                      {player.name}
+                    </div>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemovePlayer(player.id)}
+                    className="flex-shrink-0 text-muted-foreground hover:text-destructive h-6 w-6 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <div className="flex gap-2 flex-shrink-0 mt-auto pt-2">
