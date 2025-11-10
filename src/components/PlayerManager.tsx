@@ -104,7 +104,7 @@ export const PlayerManager = ({
   };
 
   return (
-    <Card className="p-5 bg-card border-border h-full flex flex-col transition-all duration-300">
+    <Card className="p-4 bg-card border-border h-full flex flex-col transition-all duration-300">
       <h2 className="text-2xl font-bold mb-4 text-foreground flex items-center justify-between flex-shrink-0">
         Players
         <span className="text-sm text-muted-foreground font-normal">({players.length})</span>
@@ -123,7 +123,7 @@ export const PlayerManager = ({
       {players.length > 0 && (
         <div className={`mb-4 flex-1 min-h-0 transition-all duration-300 ease-out ${
           players.length > 8 
-            ? 'grid grid-cols-2 gap-x-4 gap-y-2 content-start items-start' 
+            ? 'grid grid-cols-2 gap-x-2.5 gap-y-2 content-start items-start' 
             : 'flex flex-col gap-2'
         }`}>
           {players.map((player, index) => (
@@ -134,7 +134,7 @@ export const PlayerManager = ({
               onDragOver={(e) => handleDragOver(e, index)}
               onDrop={(e) => handleDrop(e, index)}
               onDragEnd={handleDragEnd}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
+              className={`flex items-center gap-2 px-2.5 py-2.5 rounded-lg border transition-all duration-200 relative group cursor-move ${
                 index === currentPlayerIndex
                   ? "border-primary bg-primary/10 shadow-[0_0_20px_hsl(var(--primary)/0.5)]"
                   : "border-border bg-muted/30 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
